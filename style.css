@@ -1,74 +1,107 @@
-* {
+/* styles.css */
+body, html {
     margin: 0;
     padding: 0;
-    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
     font-family: 'Courier New', Courier, monospace;
+    background: #000;
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-body {
-    background: url('https://media-hosting.imagekit.io//324742b5b0c34274/1000005113.webp?Expires=1837349817&Key-Pair-Id=K2ZIVPTIP2VGHC&Signature=L5Ttp8pxcxw7iE1C9OtlxcXCKVEmXGv2l-zbNferEzvqFpp8DKiLWdCA31G2w8o091qhTbqnv1LvR-YzsE6LuOnoUbIR16SD-~CNxcaRj-lql~XA4E6yAKjMdfz5iTCWp8RcCW4p5K3pKjDCQoAmU~5gehwicm55NvLNYhTPAq2rO4H4C4B-OiaSElNGsqfBjHtPJRWdXI3ZsDqoJfFb3eGe-GTX86iysprxvVub2YfN7z2XRhlRMp5fXDL0Gh~sIUqs5fBwjzdJcWwCC6Xl4240EF6qsRx5X8PloffJmUtaQU1AVMmbDVB1JrKa8IzoP5s8cKCdbDz~yJdfeUw9Vg__') no-repeat center center fixed;
-    background-size: cover;
-    color: red;
+#overlay {
     text-align: center;
-    padding: 50px;
-}
-
-#container {
+    padding: 20px;
     background: rgba(0, 0, 0, 0.8);
-    padding: 30px;
-    border-radius: 10px;
-    width: 60%;
-    margin: auto;
-    box-shadow: 0 0 20px red;
-    animation: shake 0.5s infinite alternate;
+    border: 2px solid #ff0000;
+    box-shadow: 0 0 10px #ff0000;
 }
 
-h1 {
-    font-size: 40px;
-    font-weight: bold;
-    text-transform: uppercase;
-}
-
-p {
-    font-size: 20px;
-    margin-bottom: 20px;
-}
-
-/* Efek glitch pada teks */
 .glitch {
-    font-size: 50px;
-    text-shadow: 3px 3px red, -3px -3px cyan;
-    animation: glitch 0.3s infinite alternate;
+    font-size: 2.5em;
+    position: relative;
+    display: inline-block;
+    color: #fff;
+    animation: glitch-animation 1s infinite;
 }
 
-/* Efek goyang */
-@keyframes shake {
-    from {
-        transform: translateX(-2px);
-    }
-    to {
-        transform: translateX(2px);
-    }
+.glitch::before,
+.glitch::after {
+    content: attr(data-text);
+    position: absolute;
+    left: 0;
+    color: #ff0000;
+    clip: rect(0, 900px, 0, 0);
 }
 
-/* Efek glitch */
-@keyframes glitch {
-    0% { text-shadow: 3px 3px red, -3px -3px cyan; }
-    100% { text-shadow: -3px -3px red, 3px 3px cyan; }
+.glitch::before {
+    animation: glitch-animation-before 1.5s infinite linear;
+}
+
+.glitch::after {
+    animation: glitch-animation-after 1.5s infinite linear;
+}
+
+@keyframes glitch-animation {
+    0% { transform: none; }
+    20% { transform: skew(-0.5deg, -0.5deg); }
+    40% { transform: skew(0.5deg, 0.5deg); }
+    60% { transform: skew(-0.5deg, -0.5deg); }
+    80% { transform: skew(0.5deg, 0.5deg); }
+    100% { transform: none; }
+}
+
+@keyframes glitch-animation-before {
+    0% { clip: rect(0, 900px, 0, 0); transform: translate(-2px, -2px); }
+    20% { clip: rect(10px, 900px, 30px, 0); transform: translate(2px, 2px); }
+    40% { clip: rect(20px, 900px, 40px, 0); transform: translate(-2px, -2px); }
+    60% { clip: rect(30px, 900px, 50px, 0); transform: translate(2px, 2px); }
+    80% { clip: rect(40px, 900px, 60px, 0); transform: translate(-2px, -2px); }
+    100% { clip: rect(0, 900px, 0, 0); transform: translate(0, 0); }
+}
+
+@keyframes glitch-animation-after {
+    0% { clip: rect(0, 900px, 0, 0); transform: translate(2px, 2px); }
+    20% { clip: rect(10px, 900px, 30px, 0); transform: translate(-2px, -2px); }
+    40% { clip: rect(20px, 900px, 40px, 0); transform: translate(2px, 2px); }
+    60% { clip: rect(30px, 900px, 50px, 0); transform: translate(-2px, -2px); }
+    80% { clip: rect(40px, 900px, 60px, 0); transform: translate(2px, 2px); }
+    100% { clip: rect(0, 900px, 0, 0); transform: translate(0, 0); }
+}
+
+.message {
+    margin-top: 20px;
+    font-size: 1.2em;
 }
 
 input, button {
-    padding: 15px;
-    margin-top: 10px;
-    font-size: 20px;
+    margin-top: 20px;
+    padding: 10px;
+    font-size: 16px;
     border: none;
     outline: none;
 }
 
 button {
-    background: red;
-    color: white;
+    background: #ff0000;
+    color: #fff;
     cursor: pointer;
-    font-size: 22px;
-    font-weight: bold;
+    transition: background 0.3s;
+}
+
+button:hover {
+    background: #cc0000;
+}
+
+.scary-image {
+    margin-top: 20px;
+    width: 100%;
+    max-width: 400px;
+    height: auto;
+    border: 2px solid #ff0000;
+    box-shadow: 0 0 10px #ff0000;
 }
