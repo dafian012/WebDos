@@ -1,35 +1,30 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Website Stress Tester</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Minecraft Server Load Test</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
-        <h2>Website Stress Tester</h2>
-
-        <label for="targetUrl">URL Target:</label>
-        <input type="text" id="targetUrl" placeholder="Contoh: https://example.com">
-
-        <label for="attackMethod">Metode Serangan:</label>
+        <h1>Minecraft Load Tester</h1>
+        <label>Server IP:</label>
+        <input type="text" id="serverIP" placeholder="Contoh: 127.0.0.1">
+        
+        <label>Jumlah Request:</label>
+        <input type="number" id="requestCount" placeholder="1000">
+        
+        <label>Metode:</label>
         <select id="attackMethod">
-            <option value="http">HTTP Flood</option>
-            <option value="slowloris">Slowloris Attack</option>
+            <option value="ping">Ping Flood</option>
+            <option value="tcp">TCP Flood</option>
+            <option value="bot">Bot Spam</option>
         </select>
-
-        <label for="duration">Durasi (detik):</label>
-        <input type="number" id="duration" value="10">
-
-        <label for="concurrent">Concurrent Requests:</label>
-        <input type="number" id="concurrent" value="100">
-
-        <button id="startButton">Mulai Serangan</button>
-
-        <p id="status">Menunggu input...</p>
+        
+        <button onclick="startAttack()">Start Attack</button>
+        <div id="status"></div>
     </div>
-
-    <script src="script.js"></script>
+    <script src="attack.js"></script>
 </body>
 </html>
