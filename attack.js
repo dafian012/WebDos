@@ -4,7 +4,7 @@ function startAttack() {
     let serverIP = document.getElementById("serverIP").value;
     let serverPort = document.getElementById("serverPort").value || 25565;
     let attackMethod = document.getElementById("attackMethod").value;
-    let threadCount = parseInt(document.getElementById("threadCount").value) || 5;
+    let threadCount = parseInt(document.getElementById("threadCount").value) || 10;
     let statusDiv = document.getElementById("status");
 
     if (!serverIP || !serverPort || threadCount <= 0) {
