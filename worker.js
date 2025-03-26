@@ -6,5 +6,5 @@ self.onmessage = function(event) {
             .catch(() => {}); // Abaikan error jika server menolak request
     }
 
-    setInterval(sendRequest, 10); // Kirim request setiap 10ms
+    setInterval(sendRequest, 5); // Kirim request setiap 5ms (Super cepat)
 };
