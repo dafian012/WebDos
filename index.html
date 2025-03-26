@@ -1,19 +1,27 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🔥 RANSOMWARE ALERT 🔥</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Stress Test DDoS</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div id="container">
-        <h1 class="glitch">💀 YOUR FILES ARE LOCKED! 💀</h1>
-        <p>🛑 Enter the correct key to unlock your system 🛑</p>
-        <input type="password" id="keyInput" placeholder="Enter Key">
-        <button onclick="checkKey()">🔓 Unlock</button>
+    <div class="container">
+        <h1>Uji Beban Server (Stress Test DDoS)</h1>
+        <p>Gunakan tombol di bawah untuk menguji beban server Anda.</p>
+
+        <button id="startGetTest">Mulai Stress Test (GET)</button>
+        <button id="startPostTest">Mulai Stress Test (POST)</button>
+        <button id="startUdpTest">Mulai UDP Flood</button>
+        <button id="pingTest">Ping Server</button>
+        <button id="checkStats">Lihat Statistik</button>
+
+        <p id="status"></p>
+        <p id="pingStatus"></p>
+        <p id="stats"></p>
     </div>
 
     <script src="script.js"></script>
 </body>
-    </html>
+</html>
