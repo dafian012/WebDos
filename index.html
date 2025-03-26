@@ -3,24 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stress Test DDoS</title>
+    <title>Minecraft Server Stress Test</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="container">
-        <h1>Uji Beban Server (Stress Test DDoS)</h1>
-        <p>Gunakan tombol di bawah untuk menguji beban server Anda.</p>
+    <h2>Minecraft Server Load Tester</h2>
 
-        <button id="startGetTest">Mulai Stress Test (GET)</button>
-        <button id="startPostTest">Mulai Stress Test (POST)</button>
-        <button id="startUdpTest">Mulai UDP Flood</button>
-        <button id="pingTest">Ping Server</button>
-        <button id="checkStats">Lihat Statistik</button>
+    <label for="serverIp">IP Server Minecraft:</label>
+    <input type="text" id="serverIp" placeholder="Contoh: 123.45.67.89">
 
-        <p id="status"></p>
-        <p id="pingStatus"></p>
-        <p id="stats"></p>
-    </div>
+    <label for="serverPort">Port Server:</label>
+    <input type="number" id="serverPort" placeholder="25565" value="25565">
+
+    <label for="attackMethod">Metode Serangan:</label>
+    <select id="attackMethod">
+        <option value="mcbot">MCBOT Attack</option>
+        <option value="handshake">Handshake Flood</option>
+        <option value="query">Query Flood</option>
+        <option value="raknet">RakNet Flood</option>
+    </select>
+
+    <label for="duration">Durasi (detik):</label>
+    <input type="number" id="duration" value="10">
+
+    <button onclick="startAttack()">Mulai Serangan</button>
+
+    <p id="status">Menunggu input...</p>
 
     <script src="script.js"></script>
 </body>
