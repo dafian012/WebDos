@@ -1,4 +1,4 @@
-/* Reset default margin dan padding */
+/* Reset */
 * {
     margin: 0;
     padding: 0;
@@ -6,27 +6,34 @@
     font-family: 'Arial', sans-serif;
 }
 
+/* Body Styling */
 body {
     background-color: #121212;
-    color: #ffffff;
-    text-align: center;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
     padding: 20px;
 }
 
+/* Container */
+.container {
+    max-width: 400px;
+    background-color: #1e1e1e;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 15px rgba(255, 255, 255, 0.15);
+    text-align: center;
+}
+
+/* Heading */
 h2 {
-    font-size: 24px;
+    font-size: 22px;
     margin-bottom: 20px;
 }
 
-.container {
-    max-width: 400px;
-    margin: auto;
-    background-color: #1e1e1e;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0px 0px 10px rgba(255, 255, 255, 0.2);
-}
-
+/* Label */
 label {
     display: block;
     margin: 10px 0 5px;
@@ -34,6 +41,7 @@ label {
     font-weight: bold;
 }
 
+/* Inputs & Select */
 input, select, button {
     width: 100%;
     padding: 10px;
@@ -41,13 +49,16 @@ input, select, button {
     border-radius: 5px;
     border: none;
     font-size: 16px;
+    outline: none;
 }
 
+/* Input Fields */
 input, select {
     background-color: #2a2a2a;
     color: white;
 }
 
+/* Button */
 button {
     background-color: #ff4500;
     color: white;
@@ -60,6 +71,7 @@ button:hover {
     background-color: #ff6347;
 }
 
+/* Status */
 #status {
     margin-top: 10px;
     font-size: 14px;
