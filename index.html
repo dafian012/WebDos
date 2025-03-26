@@ -3,32 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Minecraft Server Stress Test</title>
+    <title>Website Stress Tester</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h2>Minecraft Server Load Tester</h2>
+    <div class="container">
+        <h2>Website Stress Tester</h2>
 
-    <label for="serverIp">IP Server Minecraft:</label>
-    <input type="text" id="serverIp" placeholder="Contoh: 123.45.67.89">
+        <label for="targetUrl">URL Target:</label>
+        <input type="text" id="targetUrl" placeholder="Contoh: https://example.com">
 
-    <label for="serverPort">Port Server:</label>
-    <input type="number" id="serverPort" placeholder="25565" value="25565">
+        <label for="attackMethod">Metode Serangan:</label>
+        <select id="attackMethod">
+            <option value="http">HTTP Flood</option>
+            <option value="slowloris">Slowloris Attack</option>
+        </select>
 
-    <label for="attackMethod">Metode Serangan:</label>
-    <select id="attackMethod">
-        <option value="mcbot">MCBOT Attack</option>
-        <option value="handshake">Handshake Flood</option>
-        <option value="query">Query Flood</option>
-        <option value="raknet">RakNet Flood</option>
-    </select>
+        <label for="duration">Durasi (detik):</label>
+        <input type="number" id="duration" value="10">
 
-    <label for="duration">Durasi (detik):</label>
-    <input type="number" id="duration" value="10">
+        <label for="concurrent">Concurrent Requests:</label>
+        <input type="number" id="concurrent" value="100">
 
-    <button onclick="startAttack()">Mulai Serangan</button>
+        <button id="startButton">Mulai Serangan</button>
 
-    <p id="status">Menunggu input...</p>
+        <p id="status">Menunggu input...</p>
+    </div>
 
     <script src="script.js"></script>
 </body>
