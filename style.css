@@ -1,74 +1,34 @@
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Courier New', Courier, monospace;
-}
-
 body {
-    background: url('https://media-hosting.imagekit.io//324742b5b0c34274/1000005113.webp?Expires=1837349817&Key-Pair-Id=K2ZIVPTIP2VGHC&Signature=L5Ttp8pxcxw7iE1C9OtlxcXCKVEmXGv2l-zbNferEzvqFpp8DKiLWdCA31G2w8o091qhTbqnv1LvR-YzsE6LuOnoUbIR16SD-~CNxcaRj-lql~XA4E6yAKjMdfz5iTCWp8RcCW4p5K3pKjDCQoAmU~5gehwicm55NvLNYhTPAq2rO4H4C4B-OiaSElNGsqfBjHtPJRWdXI3ZsDqoJfFb3eGe-GTX86iysprxvVub2YfN7z2XRhlRMp5fXDL0Gh~sIUqs5fBwjzdJcWwCC6Xl4240EF6qsRx5X8PloffJmUtaQU1AVMmbDVB1JrKa8IzoP5s8cKCdbDz~yJdfeUw9Vg__') no-repeat center center fixed;
-    background-size: cover;
-    color: red;
+    font-family: Arial, sans-serif;
     text-align: center;
+    background-color: #f4f4f4;
     padding: 50px;
 }
 
-#container {
-    background: rgba(0, 0, 0, 0.8);
-    padding: 30px;
+.container {
+    background: white;
+    padding: 20px;
     border-radius: 10px;
-    width: 60%;
-    margin: auto;
-    box-shadow: 0 0 20px red;
-    animation: shake 0.5s infinite alternate;
-}
-
-h1 {
-    font-size: 40px;
-    font-weight: bold;
-    text-transform: uppercase;
-}
-
-p {
-    font-size: 20px;
-    margin-bottom: 20px;
-}
-
-/* Efek glitch pada teks */
-.glitch {
-    font-size: 50px;
-    text-shadow: 3px 3px red, -3px -3px cyan;
-    animation: glitch 0.3s infinite alternate;
-}
-
-/* Efek goyang */
-@keyframes shake {
-    from {
-        transform: translateX(-2px);
-    }
-    to {
-        transform: translateX(2px);
-    }
-}
-
-/* Efek glitch */
-@keyframes glitch {
-    0% { text-shadow: 3px 3px red, -3px -3px cyan; }
-    100% { text-shadow: -3px -3px red, 3px 3px cyan; }
-}
-
-input, button {
-    padding: 15px;
-    margin-top: 10px;
-    font-size: 20px;
-    border: none;
-    outline: none;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    display: inline-block;
 }
 
 button {
-    background: red;
+    background-color: #ff0000;
     color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
     cursor: pointer;
-    font-size: 22px;
-    font-weight: bold;
+    border-radius: 5px;
+    margin: 10px;
+}
+
+button:hover {
+    background-color: #cc0000;
+}
+
+p {
+    font-size: 18px;
+    margin-top: 20px;
 }
