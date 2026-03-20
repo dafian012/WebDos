@@ -2,38 +2,99 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Minecraft DoS Tool</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Web Mirror Pro - ZIP Archiver</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <style>
+        body { font-family: 'Courier New', monospace; background: #0d0d0d; color: #00ff00; padding: 20px; }
+        .container { border: 1px solid #00ff00; padding: 20px; max-width: 600px; margin: auto; box-shadow: 0 0 15px #00ff00; }
+        input { width: 100%; padding: 10px; background: #1a1a1a; border: 1px solid #00ff00; color: #00ff00; margin-bottom: 10px; box-sizing: border-box; }
+        button { width: 100%; padding: 10px; background: #00ff00; color: #000; border: none; cursor: pointer; font-weight: bold; }
+        #console { margin-top: 20px; height: 200px; overflow-y: auto; font-size: 12px; border-top: 1px solid #333; padding-top: 10px; }
+        .error { color: #ff0000; }
+    </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Minecraft DoS Tool</h1>
 
-        <label>Server IP:</label>
-        <input type="text" id="serverIP" placeholder="Contoh: 127.0.0.1">
+<div class="container">
+    <h3>[ PROJECT CLONER V2 ]</h3>
+    <input type="text" id="targetUrl" placeholder="https://target-website.com">
+    <button onclick="cloneProject()">GRAB & ZIP PROJECT</button>
+    <div id="console">Status: Ready...</div>
+</div>
 
-        <label>Port:</label>
-        <input type="number" id="serverPort" placeholder="25565">
+<script>
+    const log = (msg, isError = false) => {
+        const c = document.getElementById('console');
+        c.innerHTML += `<div class="${isError ? 'error' : ''}">> ${msg}</div>`;
+        c.scrollTop = c.scrollHeight;
+    };
 
-        <label>Metode Serangan:</label>
-        <select id="attackMethod">
-            <option value="ping">Ping Flood</option>
-            <option value="tcp">TCP Flood</option>
-            <option value="udp">UDP Flood</option>
-            <option value="bot">Bot Spam</option>
-            <option value="json">JSON Flood</option>
-        </select>
+    async function fetchData(url) {
+        const proxy = "https://api.allorigins.win/get?url=";
+        const res = await fetch(proxy + encodeURIComponent(url));
+        const data = await res.json();
+        return data.contents;
+    }
 
-        <label>Jumlah Threads:</label>
-        <input type="number" id="threadCount" placeholder="10" min="1" max="100">
+    async function cloneProject() {
+        const url = document.getElementById('targetUrl').value.trim();
+        if (!url) return alert("Link-nya mana?");
+        
+        document.getElementById('console').innerHTML = "";
+        log("Memulai koneksi ke target...");
+        
+        const zip = new JSZip();
+        const base = new URL(url);
 
-        <button onclick="startAttack()">Start Attack</button>
-        <button onclick="stopAttack()">Stop Attack</button>
+        try {
+            // 1. Ambil HTML Utama
+            const html = await fetchData(url);
+            if(!html) throw new Error("Gagal ambil HTML utama.");
+            zip.file("index.html", html);
+            log("index.html berhasil ditarik.");
 
-        <div id="status">Status: Ready</div>
-    </div>
+            // 2. Parsing Aset (CSS & JS Sederhana)
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, "text/html");
+            const assets = [];
 
-    <script src="attack.js"></script>
+            // Cari link CSS
+            doc.querySelectorAll('link[rel="stylesheet"]').forEach(el => {
+                if(el.href) assets.push({ type: 'css', url: new URL(el.getAttribute('href'), base).href });
+            });
+
+            // Cari script JS
+            doc.querySelectorAll('script[src]').forEach(el => {
+                if(el.src) assets.push({ type: 'js', url: new URL(el.getAttribute('src'), base).href });
+            });
+
+            log(`Menemukan ${assets.length} aset potensial. Mencoba mengunduh...`);
+
+            // 3. Download Aset satu per satu
+            for (let asset of assets) {
+                try {
+                    const content = await fetchData(asset.url);
+                    const fileName = asset.url.split('/').pop() || (asset.type === 'css' ? 'style.css' : 'script.js');
+                    zip.file(`${asset.type}/${fileName}`, content);
+                    log(`Downloaded: ${fileName}`);
+                } catch (e) {
+                    log(`Gagal ambil: ${asset.url}`, true);
+                }
+            }
+
+            // 4. Generate ZIP
+            log("Membungkus semua file ke proyek_1.zip...");
+            const blob = await zip.generateAsync({type:"blob"});
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = "proyek_1.zip";
+            a.click();
+            log("Selesai! Cek folder download kamu.");
+
+        } catch (err) {
+            log("Fatal Error: " + err.message, true);
+        }
+    }
+</script>
 </body>
 </html>
