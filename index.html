@@ -2,103 +2,96 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Web Code Grabber Pro</title>
+    <title>Web Mirror - GitHub Edition</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <style>
-        body { font-family: 'Consolas', monospace; background: #0a0a0a; color: #00ff00; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        .box { background: #111; border: 1px solid #00ff00; padding: 30px; border-radius: 5px; width: 100%; max-width: 600px; box-shadow: 0 0 20px rgba(0,255,0,0.2); }
-        h2 { text-align: center; text-transform: uppercase; letter-spacing: 2px; }
-        input { width: 100%; padding: 12px; margin: 20px 0; background: #000; border: 1px solid #00ff00; color: #00ff00; box-sizing: border-box; outline: none; }
-        button { width: 100%; padding: 15px; background: #00ff00; color: #000; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        button:hover { background: #00cc00; box-shadow: 0 0 10px #00ff00; }
-        #status { margin-top: 20px; font-size: 12px; height: 150px; overflow-y: auto; border-top: 1px solid #333; padding-top: 10px; color: #aaa; }
-        .success { color: #00ff00; }
-        .error { color: #ff0000; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #0d1117; color: #c9d1d9; display: flex; justify-content: center; padding: 30px; }
+        .container { background: #161b22; border: 1px solid #30363d; padding: 25px; border-radius: 10px; width: 100%; max-width: 500px; box-shadow: 0 8px 24px rgba(0,0,0,0.5); }
+        h2 { color: #58a6ff; text-align: center; margin-bottom: 20px; }
+        input { width: 100%; padding: 12px; margin-bottom: 15px; background: #0d1117; border: 1px solid #30363d; color: #58a6ff; border-radius: 6px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; background: #238636; color: white; border: none; font-weight: bold; cursor: pointer; border-radius: 6px; }
+        button:hover { background: #2ea043; }
+        #status-log { margin-top: 20px; background: #010409; padding: 15px; height: 160px; overflow-y: auto; border-radius: 6px; font-family: 'Cascadia Code', monospace; font-size: 12px; color: #7ee787; border: 1px solid #30363d; }
     </style>
 </head>
 <body>
 
-<div class="box">
-    <h2>[ WEB CLONER V5 ]</h2>
-    <input type="text" id="targetUrl" placeholder="Masukkan URL Target (https://...)" value="https://">
-    <button onclick="grabAllCode()">AMBIL SEMUA KODE & ZIP</button>
-    <div id="status">Status: Menunggu instruksi...</div>
+<div class="container">
+    <h2>Project Archiver v8</h2>
+    <input type="text" id="target" placeholder="https://target-website.com" value="https://">
+    <button onclick="startProcess()">GRAB ALL CODE</button>
+    <div id="status-log">Ready to deploy...</div>
 </div>
 
 <script>
-    const statusDiv = document.getElementById('status');
-    const log = (msg, type = '') => {
-        statusDiv.innerHTML += `<div class="${type}">> ${msg}</div>`;
-        statusDiv.scrollTop = statusDiv.scrollHeight;
+    const log = (msg) => {
+        const div = document.getElementById('status-log');
+        div.innerHTML += `<div>> ${msg}</div>`;
+        div.scrollTop = div.scrollHeight;
     };
 
-    async function fetchProxy(url) {
-        // Menggunakan AllOrigins Proxy
-        const proxy = "https://api.allorigins.win/get?url=";
-        const res = await fetch(proxy + encodeURIComponent(url));
-        const data = await res.json();
-        return data.contents;
+    async function fetchViaProxy(url) {
+        // Menggunakan AllOrigins dengan cache-busting agar GitHub tidak memblokir
+        const proxy = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}&timestamp=${Date.now()}`;
+        const res = await fetch(proxy);
+        if (!res.ok) throw new Error("Proxy Error");
+        const json = await res.json();
+        return json.contents;
     }
 
-    async function grabAllCode() {
-        const url = document.getElementById('targetUrl').value.trim();
-        if (!url || url === "https://") return alert("Masukkan URL Target!");
+    async function startProcess() {
+        const url = document.getElementById('target').value.trim();
+        if (!url || url === "https://") return alert("Masukkan URL!");
 
-        statusDiv.innerHTML = "";
-        log("Memulai proses kloning...");
-        
+        document.getElementById('status-log').innerHTML = "";
+        log("Menghubungi server target...");
+
         const zip = new JSZip();
         const baseUrl = new URL(url);
 
         try {
-            // 1. Ambil HTML Utama
-            log("Mengambil index.html...");
-            const html = await fetchProxy(url);
-            if (!html) throw new Error("Gagal mengambil HTML.");
+            // Ambil HTML
+            log("Mencoba bypass CORS...");
+            const html = await fetchViaProxy(url);
+            if (!html) throw new Error("Web target menolak akses script.");
+            
             zip.file("index.html", html);
-            log("index.html tersimpan.", "success");
+            log("Index.html berhasil diamankan.");
 
-            // 2. Parsing untuk mencari CSS dan JS
+            // Ambil CSS & JS Dasar
             const parser = new DOMParser();
             const doc = parser.parseFromString(html, "text/html");
-            const links = [];
+            const assets = [...doc.querySelectorAll('link[rel="stylesheet"], script[src]')];
 
-            // Cari CSS
-            doc.querySelectorAll('link[rel="stylesheet"]').forEach(el => {
-                const href = el.getAttribute('href');
-                if (href) links.push({ type: 'css', url: new URL(href, baseUrl).href });
-            });
+            log(`Ditemukan ${assets.length} file pendukung.`);
 
-            // Cari JS
-            doc.querySelectorAll('script[src]').forEach(el => {
-                const src = el.getAttribute('src');
-                if (src) links.push({ type: 'js', url: new URL(src, baseUrl).href });
-            });
+            for (let asset of assets.slice(0, 10)) { // Limit 10 file biar gak crash di browser HP
+                let assetUrl = asset.getAttribute('href') || asset.getAttribute('src');
+                if (assetUrl && !assetUrl.startsWith('http')) {
+                    assetUrl = new URL(assetUrl, baseUrl).href;
+                }
 
-            log(`Menemukan ${links.length} file pendukung (CSS/JS).`);
-
-            // 3. Download aset satu per satu
-            for (let item of links) {
                 try {
-                    const content = await fetchProxy(item.url);
-                    const name = item.url.split('/').pop().split('?')[0] || `file.${item.type}`;
-                    zip.file(`${item.type}/${name}`, content);
-                    log(`Downloaded: ${name}`, "success");
+                    const content = await fetchViaProxy(assetUrl);
+                    const name = assetUrl.split('/').pop().split('?')[0] || "script.js";
+                    zip.file("code/" + name, content);
+                    log(`OK: ${name}`);
                 } catch (e) {
-                    log(`Gagal ambil: ${item.url}`, "error");
+                    log(`SKIP: ${assetUrl}`);
                 }
             }
 
-            // 4. Generate & Force Download
-            log("Membungkus menjadi file ZIP...");
+            log("Membungkus ke .zip...");
             const blob = await zip.generateAsync({type: "blob"});
-            saveAs(blob, "proyek_1.zip");
             
-            log("SELESAI! File 'proyek_1.zip' berhasil diunduh.", "success");
+            // Menggunakan saveAs dari FileSaver.js
+            saveAs(blob, "proyek_1.zip");
+            log("SELESAI! Cek folder download.");
 
         } catch (err) {
-            log("FATAL ERROR: " + err.message, "error");
+            log("FAILED: " + err.message);
+            log("Coba pakai link lain (Target mungkin pakai Cloudflare).");
         }
     }
 </script>
