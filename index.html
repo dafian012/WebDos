@@ -2,99 +2,106 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Web Mirror Pro - ZIP Archiver</title>
+    <title>Web Code Grabber Pro</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <style>
-        body { font-family: 'Courier New', monospace; background: #0d0d0d; color: #00ff00; padding: 20px; }
-        .container { border: 1px solid #00ff00; padding: 20px; max-width: 600px; margin: auto; box-shadow: 0 0 15px #00ff00; }
-        input { width: 100%; padding: 10px; background: #1a1a1a; border: 1px solid #00ff00; color: #00ff00; margin-bottom: 10px; box-sizing: border-box; }
-        button { width: 100%; padding: 10px; background: #00ff00; color: #000; border: none; cursor: pointer; font-weight: bold; }
-        #console { margin-top: 20px; height: 200px; overflow-y: auto; font-size: 12px; border-top: 1px solid #333; padding-top: 10px; }
+        body { font-family: 'Consolas', monospace; background: #0a0a0a; color: #00ff00; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .box { background: #111; border: 1px solid #00ff00; padding: 30px; border-radius: 5px; width: 100%; max-width: 600px; box-shadow: 0 0 20px rgba(0,255,0,0.2); }
+        h2 { text-align: center; text-transform: uppercase; letter-spacing: 2px; }
+        input { width: 100%; padding: 12px; margin: 20px 0; background: #000; border: 1px solid #00ff00; color: #00ff00; box-sizing: border-box; outline: none; }
+        button { width: 100%; padding: 15px; background: #00ff00; color: #000; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        button:hover { background: #00cc00; box-shadow: 0 0 10px #00ff00; }
+        #status { margin-top: 20px; font-size: 12px; height: 150px; overflow-y: auto; border-top: 1px solid #333; padding-top: 10px; color: #aaa; }
+        .success { color: #00ff00; }
         .error { color: #ff0000; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h3>[ PROJECT CLONER V2 ]</h3>
-    <input type="text" id="targetUrl" placeholder="https://target-website.com">
-    <button onclick="cloneProject()">GRAB & ZIP PROJECT</button>
-    <div id="console">Status: Ready...</div>
+<div class="box">
+    <h2>[ WEB CLONER V5 ]</h2>
+    <input type="text" id="targetUrl" placeholder="Masukkan URL Target (https://...)" value="https://">
+    <button onclick="grabAllCode()">AMBIL SEMUA KODE & ZIP</button>
+    <div id="status">Status: Menunggu instruksi...</div>
 </div>
 
 <script>
-    const log = (msg, isError = false) => {
-        const c = document.getElementById('console');
-        c.innerHTML += `<div class="${isError ? 'error' : ''}">> ${msg}</div>`;
-        c.scrollTop = c.scrollHeight;
+    const statusDiv = document.getElementById('status');
+    const log = (msg, type = '') => {
+        statusDiv.innerHTML += `<div class="${type}">> ${msg}</div>`;
+        statusDiv.scrollTop = statusDiv.scrollHeight;
     };
 
-    async function fetchData(url) {
+    async function fetchProxy(url) {
+        // Menggunakan AllOrigins Proxy
         const proxy = "https://api.allorigins.win/get?url=";
         const res = await fetch(proxy + encodeURIComponent(url));
         const data = await res.json();
         return data.contents;
     }
 
-    async function cloneProject() {
+    async function grabAllCode() {
         const url = document.getElementById('targetUrl').value.trim();
-        if (!url) return alert("Link-nya mana?");
-        
-        document.getElementById('console').innerHTML = "";
-        log("Memulai koneksi ke target...");
+        if (!url || url === "https://") return alert("Masukkan URL Target!");
+
+        statusDiv.innerHTML = "";
+        log("Memulai proses kloning...");
         
         const zip = new JSZip();
-        const base = new URL(url);
+        const baseUrl = new URL(url);
 
         try {
             // 1. Ambil HTML Utama
-            const html = await fetchData(url);
-            if(!html) throw new Error("Gagal ambil HTML utama.");
+            log("Mengambil index.html...");
+            const html = await fetchProxy(url);
+            if (!html) throw new Error("Gagal mengambil HTML.");
             zip.file("index.html", html);
-            log("index.html berhasil ditarik.");
+            log("index.html tersimpan.", "success");
 
-            // 2. Parsing Aset (CSS & JS Sederhana)
+            // 2. Parsing untuk mencari CSS dan JS
             const parser = new DOMParser();
             const doc = parser.parseFromString(html, "text/html");
-            const assets = [];
+            const links = [];
 
-            // Cari link CSS
+            // Cari CSS
             doc.querySelectorAll('link[rel="stylesheet"]').forEach(el => {
-                if(el.href) assets.push({ type: 'css', url: new URL(el.getAttribute('href'), base).href });
+                const href = el.getAttribute('href');
+                if (href) links.push({ type: 'css', url: new URL(href, baseUrl).href });
             });
 
-            // Cari script JS
+            // Cari JS
             doc.querySelectorAll('script[src]').forEach(el => {
-                if(el.src) assets.push({ type: 'js', url: new URL(el.getAttribute('src'), base).href });
+                const src = el.getAttribute('src');
+                if (src) links.push({ type: 'js', url: new URL(src, baseUrl).href });
             });
 
-            log(`Menemukan ${assets.length} aset potensial. Mencoba mengunduh...`);
+            log(`Menemukan ${links.length} file pendukung (CSS/JS).`);
 
-            // 3. Download Aset satu per satu
-            for (let asset of assets) {
+            // 3. Download aset satu per satu
+            for (let item of links) {
                 try {
-                    const content = await fetchData(asset.url);
-                    const fileName = asset.url.split('/').pop() || (asset.type === 'css' ? 'style.css' : 'script.js');
-                    zip.file(`${asset.type}/${fileName}`, content);
-                    log(`Downloaded: ${fileName}`);
+                    const content = await fetchProxy(item.url);
+                    const name = item.url.split('/').pop().split('?')[0] || `file.${item.type}`;
+                    zip.file(`${item.type}/${name}`, content);
+                    log(`Downloaded: ${name}`, "success");
                 } catch (e) {
-                    log(`Gagal ambil: ${asset.url}`, true);
+                    log(`Gagal ambil: ${item.url}`, "error");
                 }
             }
 
-            // 4. Generate ZIP
-            log("Membungkus semua file ke proyek_1.zip...");
-            const blob = await zip.generateAsync({type:"blob"});
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = "proyek_1.zip";
-            a.click();
-            log("Selesai! Cek folder download kamu.");
+            // 4. Generate & Force Download
+            log("Membungkus menjadi file ZIP...");
+            const blob = await zip.generateAsync({type: "blob"});
+            saveAs(blob, "proyek_1.zip");
+            
+            log("SELESAI! File 'proyek_1.zip' berhasil diunduh.", "success");
 
         } catch (err) {
-            log("Fatal Error: " + err.message, true);
+            log("FATAL ERROR: " + err.message, "error");
         }
     }
 </script>
+
 </body>
 </html>
