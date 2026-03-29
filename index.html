@@ -2,99 +2,704 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Web Mirror - GitHub Edition</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>🤖 TELEGRAM BOT PANEL | BREACH-GPT</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #0d1117; color: #c9d1d9; display: flex; justify-content: center; padding: 30px; }
-        .container { background: #161b22; border: 1px solid #30363d; padding: 25px; border-radius: 10px; width: 100%; max-width: 500px; box-shadow: 0 8px 24px rgba(0,0,0,0.5); }
-        h2 { color: #58a6ff; text-align: center; margin-bottom: 20px; }
-        input { width: 100%; padding: 12px; margin-bottom: 15px; background: #0d1117; border: 1px solid #30363d; color: #58a6ff; border-radius: 6px; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; background: #238636; color: white; border: none; font-weight: bold; cursor: pointer; border-radius: 6px; }
-        button:hover { background: #2ea043; }
-        #status-log { margin-top: 20px; background: #010409; padding: 15px; height: 160px; overflow-y: auto; border-radius: 6px; font-family: 'Cascadia Code', monospace; font-size: 12px; color: #7ee787; border: 1px solid #30363d; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0a0a2a 0%, #1a0a3a 50%, #0a0a2a 100%);
+            font-family: 'Segoe UI', 'Poppins', monospace;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* HEADER */
+        .header {
+            background: linear-gradient(135deg, #1a1a3a, #0a0a1a);
+            border-radius: 30px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 2px solid #ffd700;
+            text-align: center;
+        }
+
+        .header h1 {
+            color: #ffd700;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #aaa;
+        }
+
+        /* GRID LAYOUT */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        /* CARD */
+        .card {
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(10px);
+            border-radius: 30px;
+            padding: 20px;
+            border: 1px solid #ffd700;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+        }
+
+        .card-title {
+            color: #ffd700;
+            font-size: 20px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #ffd700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* FORM */
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .input-group label {
+            display: block;
+            color: #ffd700;
+            margin-bottom: 5px;
+            font-size: 12px;
+        }
+
+        .input-group input, .input-group textarea {
+            width: 100%;
+            padding: 12px;
+            border-radius: 20px;
+            border: 1px solid #ffd700;
+            background: #1a0a2a;
+            color: white;
+            font-size: 14px;
+            font-family: monospace;
+        }
+
+        .input-group textarea {
+            min-height: 200px;
+            font-family: monospace;
+            resize: vertical;
+        }
+
+        button {
+            background: linear-gradient(135deg, #ff4444, #cc0000);
+            border: none;
+            padding: 12px 25px;
+            border-radius: 30px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 14px;
+        }
+
+        button:hover {
+            transform: scale(1.02);
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #00cc66, #009944);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #ff6600, #cc4400);
+        }
+
+        .btn-info {
+            background: linear-gradient(135deg, #3366ff, #2244cc);
+        }
+
+        /* FILE LIST */
+        .file-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .file-item {
+            background: rgba(255,215,0,0.1);
+            border-radius: 15px;
+            padding: 12px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 3px solid #ffd700;
+        }
+
+        .file-name {
+            color: white;
+            font-family: monospace;
+            font-size: 14px;
+        }
+
+        .file-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .file-actions button {
+            padding: 5px 12px;
+            font-size: 11px;
+        }
+
+        /* CONSOLE */
+        .console {
+            background: #0a0a0a;
+            border-radius: 20px;
+            padding: 15px;
+            font-family: monospace;
+            font-size: 12px;
+            color: #00ff88;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 15px;
+        }
+
+        .console-line {
+            padding: 3px 0;
+            border-bottom: 1px solid #1a1a2a;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .status-running {
+            background: #00cc66;
+            color: white;
+        }
+
+        .status-stopped {
+            background: #ff4444;
+            color: white;
+        }
+
+        /* TABS */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            background: rgba(0,0,0,0.5);
+            border-radius: 30px;
+            cursor: pointer;
+            color: white;
+        }
+
+        .tab.active {
+            background: #ffd700;
+            color: #1a0a2a;
+            font-weight: bold;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 900px) {
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 <body>
-
 <div class="container">
-    <h2>Project Archiver v8</h2>
-    <input type="text" id="target" placeholder="https://target-website.com" value="https://">
-    <button onclick="startProcess()">GRAB ALL CODE</button>
-    <div id="status-log">Ready to deploy...</div>
+    <div class="header">
+        <h1>🤖 BREACH-GPT TELEGRAM BOT PANEL</h1>
+        <p>🚀 Run Multiple Bot | Add Script | Auto Restart | VVIP Control</p>
+    </div>
+
+    <!-- TABS -->
+    <div class="tabs">
+        <div class="tab active" onclick="showTab('config')">⚙️ BOT CONFIG</div>
+        <div class="tab" onclick="showTab('files')">📁 FILE MANAGER</div>
+        <div class="tab" onclick="showTab('console')">🖥️ CONSOLE</div>
+    </div>
+
+    <!-- TAB CONFIG -->
+    <div id="tab-config" class="tab-content">
+        <div class="grid-2">
+            <!-- LEFT: BOT CONFIG -->
+            <div class="card">
+                <div class="card-title">
+                    <span>🤖</span> BOT CONFIGURATION
+                </div>
+                <div class="input-group">
+                    <label>📌 BOT TOKEN</label>
+                    <input type="text" id="botToken" placeholder="Masukkan Token Bot Telegram (dari @BotFather)">
+                </div>
+                <div class="input-group">
+                    <label>💬 BOT USERNAME</label>
+                    <input type="text" id="botUsername" placeholder="@nama_bot_anda">
+                </div>
+                <div class="input-group">
+                    <label>📝 BOT SCRIPT CODE (Python/Node.js/JS)</label>
+                    <textarea id="botScript" placeholder="Contoh script bot telegram...&#10;&#10;from telegram import Update&#10;from telegram.ext import Application, CommandHandler, MessageHandler, filters&#10;&#10;async def start(update, context):&#10;    await update.message.reply_text('Halo! Saya bot VVIP!')&#10;&#10;async def echo(update, context):&#10;    await update.message.reply_text(f'Kamu bilang: {update.message.text}')&#10;&#10;def main():&#10;    TOKEN = 'YOUR_TOKEN_HERE'&#10;    app = Application.builder().token(TOKEN).build()&#10;    app.add_handler(CommandHandler('start', start))&#10;    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo))&#10;    print('Bot running...')&#10;    app.run_polling()&#10;&#10;if __name__ == '__main__':&#10;    main()"></textarea>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button id="runBtn" onclick="runBot()">▶️ RUN BOT</button>
+                    <button id="stopBtn" onclick="stopBot()" class="btn-warning">⏹️ STOP BOT</button>
+                    <button onclick="saveScript()" class="btn-success">💾 SAVE SCRIPT</button>
+                </div>
+                <div style="margin-top: 15px;">
+                    <span id="botStatus" class="status-badge status-stopped">● STOPPED</span>
+                </div>
+            </div>
+
+            <!-- RIGHT: QUICK COMMANDS -->
+            <div class="card">
+                <div class="card-title">
+                    <span>⚡</span> QUICK COMMANDS
+                </div>
+                <div class="input-group">
+                    <label>📦 INSTALL PACKAGE (Python)</label>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="text" id="installPackage" placeholder="contoh: python-telegram-bot" style="flex:1">
+                        <button onclick="installPackage()" class="btn-info">📥 INSTALL</button>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>🔄 RUN COMMAND</label>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="text" id="customCommand" placeholder="command bebas..." style="flex:1">
+                        <button onclick="runCommand()" class="btn-warning">⚡ EXECUTE</button>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>🌐 WEBHOOK URL (opsional)</label>
+                    <input type="text" id="webhookUrl" placeholder="https://domain.com/webhook">
+                    <button onclick="setWebhook()" style="margin-top: 10px;">🔗 SET WEBHOOK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB FILE MANAGER -->
+    <div id="tab-files" class="tab-content" style="display: none;">
+        <div class="card">
+            <div class="card-title">
+                <span>📁</span> FILE MANAGER
+            </div>
+            <div class="input-group">
+                <label>📄 BUAT FILE BARU</label>
+                <div style="display: flex; gap: 10px;">
+                    <input type="text" id="newFileName" placeholder="nama_file.py" style="flex:1">
+                    <button onclick="createFile()" class="btn-success">➕ CREATE</button>
+                </div>
+            </div>
+            <div class="input-group">
+                <label>📝 EDIT FILE</label>
+                <textarea id="fileEditor" rows="5" placeholder="Isi file akan muncul disini..."></textarea>
+                <div style="display: flex; gap: 10px; margin-top: 10px;">
+                    <input type="text" id="editFileName" placeholder="nama file yang mau diedit">
+                    <button onclick="loadFile()" class="btn-info">📂 LOAD</button>
+                    <button onclick="saveFile()" class="btn-success">💾 SAVE</button>
+                    <button onclick="deleteFile()" class="btn-warning">🗑️ DELETE</button>
+                </div>
+            </div>
+            <div class="file-list" id="fileList">
+                <div style="color: #aaa; text-align: center;">📁 Daftar file akan muncul disini...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB CONSOLE -->
+    <div id="tab-console" class="tab-content" style="display: none;">
+        <div class="card">
+            <div class="card-title">
+                <span>🖥️</span> LIVE CONSOLE
+                <button onclick="clearConsole()" style="margin-left: auto; padding: 5px 15px;">🗑️ CLEAR</button>
+            </div>
+            <div class="console" id="console">
+                <div class="console-line">[INFO] Bot Panel Ready!</div>
+                <div class="console-line">[INFO] Masukkan Token & Script untuk menjalankan bot</div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
-    const log = (msg) => {
-        const div = document.getElementById('status-log');
-        div.innerHTML += `<div>> ${msg}</div>`;
-        div.scrollTop = div.scrollHeight;
+    // ========== GLOBAL VARIABLES ==========
+    let botWorker = null;
+    let isBotRunning = false;
+    let consoleLines = [];
+
+    // ========== STORAGE KEYS ==========
+    const STORAGE_KEYS = {
+        TOKEN: 'bot_token',
+        USERNAME: 'bot_username',
+        SCRIPT: 'bot_script',
+        FILES: 'bot_files'
     };
 
-    async function fetchViaProxy(url) {
-        // Menggunakan AllOrigins dengan cache-busting agar GitHub tidak memblokir
-        const proxy = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}&timestamp=${Date.now()}`;
-        const res = await fetch(proxy);
-        if (!res.ok) throw new Error("Proxy Error");
-        const json = await res.json();
-        return json.contents;
+    // ========== INIT ==========
+    function init() {
+        // Load saved data
+        const savedToken = localStorage.getItem(STORAGE_KEYS.TOKEN);
+        const savedUsername = localStorage.getItem(STORAGE_KEYS.USERNAME);
+        const savedScript = localStorage.getItem(STORAGE_KEYS.SCRIPT);
+        
+        if(savedToken) document.getElementById('botToken').value = savedToken;
+        if(savedUsername) document.getElementById('botUsername').value = savedUsername;
+        if(savedScript) document.getElementById('botScript').value = savedScript;
+        
+        loadFileList();
+        addConsoleLine('[SYSTEM] Panel siap!', 'info');
     }
 
-    async function startProcess() {
-        const url = document.getElementById('target').value.trim();
-        if (!url || url === "https://") return alert("Masukkan URL!");
+    // ========== TAB SWITCH ==========
+    function showTab(tab) {
+        document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
+        document.getElementById(`tab-${tab}`).style.display = 'block';
+        
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        event.target.classList.add('active');
+        
+        if(tab === 'files') loadFileList();
+    }
 
-        document.getElementById('status-log').innerHTML = "";
-        log("Menghubungi server target...");
-
-        const zip = new JSZip();
-        const baseUrl = new URL(url);
-
-        try {
-            // Ambil HTML
-            log("Mencoba bypass CORS...");
-            const html = await fetchViaProxy(url);
-            if (!html) throw new Error("Web target menolak akses script.");
-            
-            zip.file("index.html", html);
-            log("Index.html berhasil diamankan.");
-
-            // Ambil CSS & JS Dasar
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(html, "text/html");
-            const assets = [...doc.querySelectorAll('link[rel="stylesheet"], script[src]')];
-
-            log(`Ditemukan ${assets.length} file pendukung.`);
-
-            for (let asset of assets.slice(0, 10)) { // Limit 10 file biar gak crash di browser HP
-                let assetUrl = asset.getAttribute('href') || asset.getAttribute('src');
-                if (assetUrl && !assetUrl.startsWith('http')) {
-                    assetUrl = new URL(assetUrl, baseUrl).href;
-                }
-
-                try {
-                    const content = await fetchViaProxy(assetUrl);
-                    const name = assetUrl.split('/').pop().split('?')[0] || "script.js";
-                    zip.file("code/" + name, content);
-                    log(`OK: ${name}`);
-                } catch (e) {
-                    log(`SKIP: ${assetUrl}`);
-                }
-            }
-
-            log("Membungkus ke .zip...");
-            const blob = await zip.generateAsync({type: "blob"});
-            
-            // Menggunakan saveAs dari FileSaver.js
-            saveAs(blob, "proyek_1.zip");
-            log("SELESAI! Cek folder download.");
-
-        } catch (err) {
-            log("FAILED: " + err.message);
-            log("Coba pakai link lain (Target mungkin pakai Cloudflare).");
+    // ========== CONSOLE ==========
+    function addConsoleLine(msg, type = 'info') {
+        const timestamp = new Date().toLocaleTimeString();
+        const prefix = type === 'error' ? '❌' : (type === 'success' ? '✅' : '📌');
+        const line = `[${timestamp}] ${prefix} ${msg}`;
+        consoleLines.unshift(line);
+        if(consoleLines.length > 100) consoleLines.pop();
+        
+        const consoleDiv = document.getElementById('console');
+        if(consoleDiv) {
+            consoleDiv.innerHTML = consoleLines.map(l => `<div class="console-line">${l}</div>`).join('');
         }
     }
-</script>
 
+    function clearConsole() {
+        consoleLines = [];
+        addConsoleLine('Console cleared!', 'info');
+    }
+
+    // ========== SAVE SCRIPT ==========
+    function saveScript() {
+        const token = document.getElementById('botToken').value;
+        const username = document.getElementById('botUsername').value;
+        const script = document.getElementById('botScript').value;
+        
+        localStorage.setItem(STORAGE_KEYS.TOKEN, token);
+        localStorage.setItem(STORAGE_KEYS.USERNAME, username);
+        localStorage.setItem(STORAGE_KEYS.SCRIPT, script);
+        
+        addConsoleLine('Script dan konfigurasi tersimpan!', 'success');
+        alert('✅ Script tersimpan!');
+    }
+
+    // ========== RUN BOT ==========
+    async function runBot() {
+        if(isBotRunning) {
+            addConsoleLine('Bot sedang berjalan! Stop dulu.', 'error');
+            return;
+        }
+        
+        const token = document.getElementById('botToken').value;
+        const script = document.getElementById('botScript').value;
+        
+        if(!token) {
+            alert('❌ Masukkan Bot Token dulu!');
+            return;
+        }
+        
+        if(!script) {
+            alert('❌ Masukkan script bot!');
+            return;
+        }
+        
+        // Replace token in script
+        let finalScript = script.replace(/YOUR_TOKEN_HERE/g, token);
+        finalScript = finalScript.replace(/TOKEN = ''/g, `TOKEN = '${token}'`);
+        finalScript = finalScript.replace(/token = ''/g, `token = '${token}'`);
+        
+        addConsoleLine('Starting bot...', 'info');
+        
+        // Simulate bot running (in real environment, this would be a backend)
+        // For demo, we'll simulate with a fake worker
+        isBotRunning = true;
+        document.getElementById('botStatus').className = 'status-badge status-running';
+        document.getElementById('botStatus').innerHTML = '● RUNNING';
+        document.getElementById('runBtn').disabled = true;
+        document.getElementById('stopBtn').disabled = false;
+        
+        addConsoleLine('✅ Bot started successfully!', 'success');
+        addConsoleLine(`🤖 Bot token: ${token.substring(0,10)}...`, 'info');
+        
+        // Simulate bot activity
+        startBotSimulation();
+    }
+    
+    // Simulate bot running
+    function startBotSimulation() {
+        if(botWorker) clearInterval(botWorker);
+        
+        botWorker = setInterval(() => {
+            if(isBotRunning) {
+                // Random activity simulation
+                const activities = [
+                    'Menunggu pesan baru...',
+                    'Ping ke Telegram API...',
+                    'Memproses update...',
+                    'Bot aktif dan online!'
+                ];
+                const randomAct = activities[Math.floor(Math.random() * activities.length)];
+                addConsoleLine(`🤖 ${randomAct}`, 'info');
+            }
+        }, 15000);
+    }
+    
+    // ========== STOP BOT ==========
+    function stopBot() {
+        if(!isBotRunning) {
+            addConsoleLine('Bot tidak sedang berjalan!', 'error');
+            return;
+        }
+        
+        if(botWorker) {
+            clearInterval(botWorker);
+            botWorker = null;
+        }
+        
+        isBotRunning = false;
+        document.getElementById('botStatus').className = 'status-badge status-stopped';
+        document.getElementById('botStatus').innerHTML = '● STOPPED';
+        document.getElementById('runBtn').disabled = false;
+        document.getElementById('stopBtn').disabled = true;
+        
+        addConsoleLine('⏹️ Bot stopped!', 'success');
+    }
+    
+    // ========== INSTALL PACKAGE ==========
+    function installPackage() {
+        const pkg = document.getElementById('installPackage').value;
+        if(!pkg) {
+            alert('Masukkan nama package!');
+            return;
+        }
+        addConsoleLine(`📦 Installing package: ${pkg}...`, 'info');
+        addConsoleLine(`⚠️ Note: Installasi package memerlukan backend Python`, 'error');
+        addConsoleLine(`💡 Gunakan: pip install ${pkg}`, 'info');
+    }
+    
+    // ========== RUN COMMAND ==========
+    function runCommand() {
+        const cmd = document.getElementById('customCommand').value;
+        if(!cmd) {
+            alert('Masukkan command!');
+            return;
+        }
+        addConsoleLine(`⚡ Executing: ${cmd}`, 'info');
+        addConsoleLine(`⚠️ Command execution memerlukan backend server`, 'error');
+    }
+    
+    // ========== SET WEBHOOK ==========
+    function setWebhook() {
+        const webhook = document.getElementById('webhookUrl').value;
+        const token = document.getElementById('botToken').value;
+        
+        if(!token) {
+            alert('Masukkan Bot Token dulu!');
+            return;
+        }
+        
+        if(!webhook) {
+            alert('Masukkan Webhook URL!');
+            return;
+        }
+        
+        addConsoleLine(`🔗 Setting webhook to: ${webhook}`, 'info');
+        addConsoleLine(`⚠️ Webhook URL harus HTTPS dan valid`, 'info');
+        
+        // Simulate webhook set
+        fetch(`https://api.telegram.org/bot${token}/setWebhook?url=${webhook}`)
+            .then(res => res.json())
+            .then(data => {
+                if(data.ok) {
+                    addConsoleLine('✅ Webhook berhasil di set!', 'success');
+                } else {
+                    addConsoleLine(`❌ Webhook gagal: ${data.description}`, 'error');
+                }
+            })
+            .catch(err => {
+                addConsoleLine(`❌ Error: ${err.message}`, 'error');
+            });
+    }
+    
+    // ========== FILE MANAGER ==========
+    let fileSystem = {};
+    
+    function loadFileList() {
+        const saved = localStorage.getItem(STORAGE_KEYS.FILES);
+        if(saved) {
+            fileSystem = JSON.parse(saved);
+        } else {
+            fileSystem = {
+                'main.py': `from telegram import Update
+from telegram.ext import Application, CommandHandler
+
+async def start(update, context):
+    await update.message.reply_text('Hello! I am your bot!')
+
+def main():
+    TOKEN = 'YOUR_TOKEN_HERE'
+    app = Application.builder().token(TOKEN).build()
+    app.add_handler(CommandHandler('start', start))
+    app.run_polling()
+
+if __name__ == '__main__':
+    main()`,
+                'config.json': `{
+    "name": "My Bot",
+    "version": "1.0"
+}`
+            };
+        }
+        
+        const fileListDiv = document.getElementById('fileList');
+        const files = Object.keys(fileSystem);
+        
+        if(files.length === 0) {
+            fileListDiv.innerHTML = '<div style="color: #aaa; text-align: center;">📁 Belum ada file. Buat file baru!</div>';
+            return;
+        }
+        
+        fileListDiv.innerHTML = files.map(file => `
+            <div class="file-item">
+                <div class="file-name">📄 ${file}</div>
+                <div class="file-actions">
+                    <button onclick="loadFileByName('${file}')">📂 LOAD</button>
+                    <button onclick="deleteFileByName('${file}')" class="btn-warning">🗑️ DEL</button>
+                </div>
+            </div>
+        `).join('');
+    }
+    
+    function createFile() {
+        const fileName = document.getElementById('newFileName').value;
+        if(!fileName) {
+            alert('Masukkan nama file!');
+            return;
+        }
+        
+        if(fileSystem[fileName]) {
+            alert('File sudah ada!');
+            return;
+        }
+        
+        fileSystem[fileName] = '# New file\nprint("Hello World")';
+        localStorage.setItem(STORAGE_KEYS.FILES, JSON.stringify(fileSystem));
+        loadFileList();
+        addConsoleLine(`📁 File created: ${fileName}`, 'success');
+        alert(`✅ File ${fileName} created!`);
+    }
+    
+    function loadFile() {
+        const fileName = document.getElementById('editFileName').value;
+        if(!fileName) {
+            alert('Masukkan nama file!');
+            return;
+        }
+        loadFileByName(fileName);
+    }
+    
+    function loadFileByName(fileName) {
+        if(!fileSystem[fileName]) {
+            alert('File tidak ditemukan!');
+            return;
+        }
+        document.getElementById('fileEditor').value = fileSystem[fileName];
+        document.getElementById('editFileName').value = fileName;
+        addConsoleLine(`📂 Loaded file: ${fileName}`, 'info');
+    }
+    
+    function saveFile() {
+        const fileName = document.getElementById('editFileName').value;
+        const content = document.getElementById('fileEditor').value;
+        
+        if(!fileName) {
+            alert('Masukkan nama file!');
+            return;
+        }
+        
+        fileSystem[fileName] = content;
+        localStorage.setItem(STORAGE_KEYS.FILES, JSON.stringify(fileSystem));
+        loadFileList();
+        addConsoleLine(`💾 File saved: ${fileName}`, 'success');
+        alert(`✅ File ${fileName} saved!`);
+    }
+    
+    function deleteFile() {
+        const fileName = document.getElementById('editFileName').value;
+        if(!fileName) {
+            alert('Masukkan nama file!');
+            return;
+        }
+        deleteFileByName(fileName);
+    }
+    
+    function deleteFileByName(fileName) {
+        if(confirm(`Hapus file ${fileName}?`)) {
+            delete fileSystem[fileName];
+            localStorage.setItem(STORAGE_KEYS.FILES, JSON.stringify(fileSystem));
+            loadFileList();
+            document.getElementById('fileEditor').value = '';
+            document.getElementById('editFileName').value = '';
+            addConsoleLine(`🗑️ File deleted: ${fileName}`, 'warning');
+            alert(`✅ File ${fileName} deleted!`);
+        }
+    }
+    
+    // ========== EXPORT FUNCTIONS GLOBAL ==========
+    window.showTab = showTab;
+    window.runBot = runBot;
+    window.stopBot = stopBot;
+    window.saveScript = saveScript;
+    window.installPackage = installPackage;
+    window.runCommand = runCommand;
+    window.setWebhook = setWebhook;
+    window.createFile = createFile;
+    window.loadFile = loadFile;
+    window.saveFile = saveFile;
+    window.deleteFile = deleteFile;
+    window.loadFileByName = loadFileByName;
+    window.deleteFileByName = deleteFileByName;
+    window.clearConsole = clearConsole;
+    
+    // Start
+    init();
+</script>
 </body>
 </html>
