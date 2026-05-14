@@ -3,13 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>API Tester</title>
+<title>API Request Tester</title>
 
 <style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:sans-serif;
+}
+
 body{
     background:#0f0f0f;
     color:white;
-    font-family:sans-serif;
     display:flex;
     justify-content:center;
     align-items:center;
@@ -17,10 +23,16 @@ body{
 }
 
 .box{
-    width:340px;
+    width:350px;
     background:#1c1c1c;
     padding:20px;
     border-radius:16px;
+    box-shadow:0 0 20px rgba(0,0,0,0.5);
+}
+
+h2{
+    text-align:center;
+    margin-bottom:15px;
 }
 
 input, textarea, button{
@@ -29,6 +41,12 @@ input, textarea, button{
     padding:12px;
     border:none;
     border-radius:10px;
+    outline:none;
+}
+
+textarea{
+    resize:none;
+    height:100px;
 }
 
 button{
@@ -38,78 +56,115 @@ button{
     cursor:pointer;
 }
 
+button:hover{
+    opacity:0.9;
+}
+
 #log{
-    margin-top:10px;
+    margin-top:15px;
     font-size:14px;
+    word-break:break-word;
 }
 </style>
 </head>
 <body>
 
 <div class="box">
+
     <h2>API Tester</h2>
 
-    <input type="text" id="url" placeholder="Endpoint URL">
+    <input type="text" id="url"
+    placeholder="https://example.com/api">
 
-    <textarea id="message" placeholder="Pesan"></textarea>
+    <textarea id="message"
+    placeholder="Isi pesan"></textarea>
 
-    <input type="number" id="count" placeholder="Jumlah kirim (max 5)" max="5">
+    <input type="number" id="count"
+    placeholder="Jumlah request max 5" max="5">
 
-    <input type="number" id="delay" placeholder="Delay ms (contoh 1000)">
+    <input type="number" id="delay"
+    placeholder="Delay ms contoh 1000">
 
-    <button onclick="startSend()">Mulai</button>
+    <button onclick="startSend()">
+        Kirim
+    </button>
 
     <div id="log"></div>
+
 </div>
 
 <script>
-function wait(ms){
+
+function sleep(ms){
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 async function startSend(){
 
-    const url = document.getElementById("url").value;
-    const message = document.getElementById("message").value;
+    const url =
+    document.getElementById("url").value.trim();
+
+    const message =
+    document.getElementById("message").value;
+
     const count = Math.min(
-        parseInt(document.getElementById("count").value || 1),
+        parseInt(
+            document.getElementById("count").value || 1
+        ),
         5
     );
 
-    const delay = parseInt(
+    const delay =
+    parseInt(
         document.getElementById("delay").value || 1000
     );
 
-    const log = document.getElementById("log");
+    const log =
+    document.getElementById("log");
 
-    log.innerHTML = "";
+    if(!url){
+        alert("Masukkan URL API");
+        return;
+    }
 
-    for(let i=1; i<=count; i++){
+    log.innerHTML = "Memulai...<br><br>";
+
+    for(let i = 1; i <= count; i++){
 
         try{
 
-            const res = await fetch(url,{
+            const response = await fetch(url,{
                 method:"POST",
                 headers:{
                     "Content-Type":"application/json"
                 },
-                body: JSON.stringify({
-                    message: message
+                body:JSON.stringify({
+                    message:message
                 })
             });
 
-            log.innerHTML += `Kirim ${i}: ${res.status}<br>`;
+            const text = await response.text();
+
+            log.innerHTML += `
+            Request ${i}<br>
+            Status: ${response.status}<br>
+            Response: ${text}<br><br>
+            `;
 
         }catch(err){
 
-            log.innerHTML += `Error ${i}: ${err.message}<br>`;
+            log.innerHTML += `
+            Request ${i} gagal<br>
+            Error: ${err.message}<br><br>
+            `;
         }
 
-        await wait(delay);
+        await sleep(delay);
     }
 
-    log.innerHTML += "<br>Selesai.";
+    log.innerHTML += "Selesai.";
 }
+
 </script>
 
 </body>
