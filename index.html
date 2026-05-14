@@ -1,113 +1,79 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>API Request Tester</title>
-
-<style>
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:sans-serif;
-}
-
-body{
-    background:#0f0f0f;
-    color:white;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    height:100vh;
-}
-
-.box{
-    width:350px;
-    background:#1c1c1c;
-    padding:20px;
-    border-radius:16px;
-    box-shadow:0 0 20px rgba(0,0,0,0.5);
-}
-
-h2{
-    text-align:center;
-    margin-bottom:15px;
-}
-
-input, textarea, button{
-    width:100%;
-    margin-top:10px;
-    padding:12px;
-    border:none;
-    border-radius:10px;
-    outline:none;
-}
-
-textarea{
-    resize:none;
-    height:100px;
-}
-
-button{
-    background:#5865f2;
-    color:white;
-    font-weight:bold;
-    cursor:pointer;
-}
-
-button:hover{
-    opacity:0.9;
-}
-
-#log{
-    margin-top:15px;
-    font-size:14px;
-    word-break:break-word;
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NGL Sender Bot</title>
+    <style>
+        body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background: #121212; color: white; margin: 0; }
+        .card { background: #1e1e1e; padding: 2rem; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); width: 100%; max-width: 350px; }
+        input, textarea, button { width: 100%; margin-bottom: 1rem; padding: 12px; border-radius: 8px; border: none; box-sizing: border-box; }
+        input, textarea { background: #2d2d2d; color: white; }
+        button { background: #ef233c; color: white; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        button:hover { background: #d90429; }
+        #status { text-align: center; font-size: 0.9rem; margin-top: 10px; }
+    </style>
 </head>
 <body>
 
-<div class="box">
-
-    <h2>API Tester</h2>
-
-    <input type="text" id="url"
-    placeholder="https://example.com/api">
-
-    <textarea id="message"
-    placeholder="Isi pesan"></textarea>
-
-    <input type="number" id="count"
-    placeholder="Jumlah request max 5" max="5">
-
-    <input type="number" id="delay"
-    placeholder="Delay ms contoh 1000">
-
-    <button onclick="startSend()">
-        Kirim
-    </button>
-
-    <div id="log"></div>
-
+<div class="card">
+    <h2 style="text-align: center;">NGL Sender</h2>
+    <input type="text" id="username" placeholder="Username NGL (Contoh: budi_aja)" required>
+    <textarea id="message" rows="4" placeholder="Tulis pesan rahasiamu..." required></textarea>
+    <button onclick="sendNgl()">Kirim Pesan</button>
+    <div id="status"></div>
 </div>
 
 <script>
+    async function sendNgl() {
+        const user = document.getElementById('username').value.trim();
+        const msg = document.getElementById('message').value;
+        const status = document.getElementById('status');
 
-function sleep(ms){
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
+        if(!user || !msg) {
+            status.innerText = "Isi dulu semua bos!";
+            status.style.color = "yellow";
+            return;
+        }
 
-async function startSend(){
+        status.innerText = "Sedang mengirim...";
+        status.style.color = "white";
 
-    const url =
-    document.getElementById("url").value.trim();
+        try {
+            // Kita pakai proxy CORS gratisan karena NGL biasanya ngeblok request langsung dari browser lain
+            const proxy = "https://cors-anywhere.herokuapp.com/"; 
+            const url = `https://ngl.link/api/submit`;
+            
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                },
+                body: new URLSearchParams({
+                    'username': user,
+                    'question': msg,
+                    'deviceId': Math.random().toString(36).substring(2, 15) // Device ID acak
+                })
+            });
 
-    const message =
-    document.getElementById("message").value;
+            if (response.ok) {
+                status.innerText = "🚀 Pesan Terkirim!";
+                status.style.color = "#4bb543";
+                document.getElementById('message').value = ""; // Clear pesan
+            } else {
+                status.innerText = "Gagal kirim. Coba lagi.";
+                status.style.color = "#ff4d4d";
+            }
+        } catch (error) {
+            status.innerText = "Error: Pastikan koneksi aman.";
+            status.style.color = "#ff4d4d";
+            console.error(error);
+        }
+    }
+</script>
 
-    const count = Math.min(
+</body>
+</html>    const count = Math.min(
         parseInt(
             document.getElementById("count").value || 1
         ),
