@@ -1,137 +1,120 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NGL Sender Bot</title>
-    <style>
-        body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background: #121212; color: white; margin: 0; }
-        .card { background: #1e1e1e; padding: 2rem; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); width: 100%; max-width: 350px; }
-        input, textarea, button { width: 100%; margin-bottom: 1rem; padding: 12px; border-radius: 8px; border: none; box-sizing: border-box; }
-        input, textarea { background: #2d2d2d; color: white; }
-        button { background: #ef233c; color: white; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        button:hover { background: #d90429; }
-        #status { text-align: center; font-size: 0.9rem; margin-top: 10px; }
-    </style>
-</head>
-<body>
+const { default: makeWASocket, useMultiFileAuthState } = require('@whiskeysockets/baileys');
 
-<div class="card">
-    <h2 style="text-align: center;">NGL Sender</h2>
-    <input type="text" id="username" placeholder="Username NGL (Contoh: budi_aja)" required>
-    <textarea id="message" rows="4" placeholder="Tulis pesan rahasiamu..." required></textarea>
-    <button onclick="sendNgl()">Kirim Pesan</button>
-    <div id="status"></div>
-</div>
+let pairingCode = '';
+let sock;
+let nomorTarget = '';
 
-<script>
-    async function sendNgl() {
-        const user = document.getElementById('username').value.trim();
-        const msg = document.getElementById('message').value;
-        const status = document.getElementById('status');
+async function startBot() {
+    const { state, saveCreds } = await useMultiFileAuthState('./auth');
+    sock = makeWASocket({
+        auth: state,
+        printQRInTerminal: false,
+        syncFullHistory: false,
+        browser: ['Bot Doa', 'Chrome', '1.0.0']
+    });
 
-        if(!user || !msg) {
-            status.innerText = "Isi dulu semua bos!";
-            status.style.color = "yellow";
-            return;
-        }
-
-        status.innerText = "Sedang mengirim...";
-        status.style.color = "white";
-
-        try {
-            // Kita pakai proxy CORS gratisan karena NGL biasanya ngeblok request langsung dari browser lain
-            const proxy = "https://cors-anywhere.herokuapp.com/"; 
-            const url = `https://ngl.link/api/submit`;
-            
-            const response = await fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-                },
-                body: new URLSearchParams({
-                    'username': user,
-                    'question': msg,
-                    'deviceId': Math.random().toString(36).substring(2, 15) // Device ID acak
-                })
-            });
-
-            if (response.ok) {
-                status.innerText = "🚀 Pesan Terkirim!";
-                status.style.color = "#4bb543";
-                document.getElementById('message').value = ""; // Clear pesan
-            } else {
-                status.innerText = "Gagal kirim. Coba lagi.";
-                status.style.color = "#ff4d4d";
+    // Minta kode kalau nomor sudah diisi
+    if (!sock.authState.creds.registered) {
+        sock.ev.on('creds.update', async () => {
+            if (nomorTarget) {
+                setTimeout(async () => {
+                    try {
+                        pairingCode = await sock.requestPairingCode(nomorTarget);
+                    } catch (e) {
+                        pairingCode = 'Nomor salah / belum awali 62';
+                    }
+                }, 2000);
             }
-        } catch (error) {
-            status.innerText = "Error: Pastikan koneksi aman.";
-            status.style.color = "#ff4d4d";
-            console.error(error);
+        });
+    }
+
+    // Simpan sesi
+    sock.ev.on('creds.update', saveCreds);
+
+    // Status koneksi
+    sock.ev.on('connection.update', (up) => {
+        const { connection } = up;
+        if (connection === 'open') {
+            pairingCode = '✅ BERHASIL TERHUBUNG! Bot siap dipakai.';
+            nomorTarget = ''; // Reset nomor
         }
-    }
-</script>
+        if (connection === 'close') startBot();
+    });
 
-</body>
-</html>    const count = Math.min(
-        parseInt(
-            document.getElementById("count").value || 1
-        ),
-        5
-    );
+    // === FITUR BOT DOA ===
+    sock.ev.on('messages.upsert', async m => {
+        const pesan = m.messages[0];
+        if (!pesan.key.fromMe && pesan.message) {
+            const teks = pesan.message.conversation || pesan.message.extendedTextMessage?.text;
+            const pengirim = pesan.key.remoteJid;
 
-    const delay =
-    parseInt(
-        document.getElementById("delay").value || 1000
-    );
-
-    const log =
-    document.getElementById("log");
-
-    if(!url){
-        alert("Masukkan URL API");
-        return;
-    }
-
-    log.innerHTML = "Memulai...<br><br>";
-
-    for(let i = 1; i <= count; i++){
-
-        try{
-
-            const response = await fetch(url,{
-                method:"POST",
-                headers:{
-                    "Content-Type":"application/json"
-                },
-                body:JSON.stringify({
-                    message:message
-                })
-            });
-
-            const text = await response.text();
-
-            log.innerHTML += `
-            Request ${i}<br>
-            Status: ${response.status}<br>
-            Response: ${text}<br><br>
-            `;
-
-        }catch(err){
-
-            log.innerHTML += `
-            Request ${i} gagal<br>
-            Error: ${err.message}<br><br>
-            `;
+            if (teks?.toLowerCase() === 'doa pagi') {
+                await sock.sendMessage(pengirim, { text: `Doa Pagi:
+"Ya Allah, dengan rahmat-Mu Engkau bangunkan kami dari tidur, sehatkanlah tubuh kami, terangi hati kami dengan cahaya iman, dan mudahkanlah segala urusan kami sepanjang hari ini. Aamiin."` });
+            }
+            if (teks?.toLowerCase() === 'doa sore') {
+                await sock.sendMessage(pengirim, { text: `Doa Sore:
+"Ya Allah, atas nikmat dan perlindungan-Mu kami memasuki sore hari, lindungilah kami dari kejahatan makhluk-Mu, dan terimalah amal ibadah kami sepanjang hari ini. Aamiin."` });
+            }
+            if (teks?.toLowerCase() === 'doa tidur') {
+                await sock.sendMessage(pengirim, { text: `Doa Tidur:
+"Ya Allah, atas nama-Mu aku hidup dan mati. Jika Engkau mencabut nyawaku, maka ampunilah aku. Dan jika Engkau mengembalikannya, maka lindungilah aku sebagaimana Engkau melindungi hamba-hamba-Mu yang saleh."` });
+            }
         }
-
-        await sleep(delay);
-    }
-
-    log.innerHTML += "Selesai.";
+    });
 }
 
-</script>
+// Jalankan bot
+startBot();
 
-</body>
-</html>
+// HALAMAN WEB INPUT NOMOR + TAMPIL KODE
+module.exports = async (req, res) => {
+    res.setHeader('Content-Type', 'text/html');
+
+    // Ambil nomor dari input
+    if (req.method === 'POST') {
+        const body = [];
+        req.on('data', chunk => body.push(chunk));
+        req.on('end', () => {
+            const data = Buffer.concat(body).toString();
+            nomorTarget = new URLSearchParams(data).get('nomor');
+            pairingCode = 'Sedang diproses...';
+        });
+    }
+
+    res.write(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Bot WA - Ambil Kode Pairing</title>
+        <style>
+            body { font-family: Arial; text-align: center; padding-top: 50px; background: #f0f2f5; }
+            .card { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); display: inline-block; width: 320px; }
+            h2 { color: #25d366; }
+            input { width: 90%; padding: 10px; margin: 15px 0; border: 1px solid #ccc; border-radius: 6px; font-size: 16px; }
+            button { background: #25d366; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 16px; width: 100%; }
+            .kode-box { margin-top: 20px; padding: 15px; background: #e8f5e9; border-radius: 8px; }
+            .kode { font-size: 30px; font-weight: bold; color: #1b5e20; letter-spacing: 4px; }
+            .info { font-size: 13px; color: #666; margin-top: 10px; }
+        </style>
+    </head>
+    <body>
+        <div class="card">
+            <h2>🔑 Kode Pairing WhatsApp</h2>
+            <form method="POST">
+                <input type="text" name="nomor" placeholder="Masukkan nomor, contoh: 628123456789" required>
+                <button type="submit">DAPATKAN KODE</button>
+            </form>
+
+            <div class="kode-box">
+                <p>Kode Kamu:</p>
+                <div class="kode">${pairingCode || 'Masukkan nomor dulu'}</div>
+            </div>
+
+            <p class="info">Caranya: Buka WhatsApp > Titik tiga > Perangkat Tertaut > Tautkan Perangkat > Masukkan kode di atas.</p>
+        </div>
+    </body>
+    </html>
+    `);
+    res.end();
+};
