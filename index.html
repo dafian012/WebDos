@@ -3,111 +3,123 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dafian Checker Bio</title>
+    <title>Dafian Checker Panel</title>
     <style>
-        * { margin:0; padding:0; box-sizing:border-box; font-family:Arial, sans-serif; }
-        body { background:#f5f5f5; padding:20px; max-width:650px; margin:0 auto; }
-        .card { background:#fff; padding:20px; border-radius:8px; box-shadow:0 2px 6px #0002; margin-bottom:16px; }
-        h2 { color:#222; margin-bottom:15px; text-align:center; }
-        input, textarea { width:100%; padding:10px; margin:8px 0 15px; border:1px solid #ddd; border-radius:4px; }
-        button { width:100%; padding:11px; background:#2563eb; color:#fff; border:none; border-radius:4px; font-size:16px; cursor:pointer; }
-        button:disabled { background:#94a3b8; cursor:not-allowed; }
-        .info { background:#e8f0fe; padding:12px; border-radius:4px; margin:10px 0; text-align:center; font-weight:bold; }
-        .peringatan { color:#dc2626; text-align:center; font-weight:bold; margin:10px 0; }
-        .hasil { background:#111; color:#0f0; padding:15px; border-radius:4px; white-space:pre-wrap; max-height:450px; overflow-y:auto; font-family:monospace; font-size:13px; }
+        * { font-family: Arial; box-sizing: border-box; }
+        body { background: #f0f2f5; max-width: 650px; margin: 0 auto; padding: 20px; }
+        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px #0002; margin-bottom: 16px; }
+        h2 { text-align: center; color: #1a73e8; }
+        label { display: block; margin: 12px 0 6px; font-weight: 500; }
+        input, textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; }
+        button { width: 100%; padding: 11px; margin-top: 10px; border: none; border-radius: 4px; font-size: 16px; cursor: pointer; }
+        .btn-blue { background: #2563eb; color: white; }
+        .btn-green { background: #10b981; color: white; }
+        .hasil { background: #111; color: #0f0; padding: 15px; border-radius: 4px; white-space: pre-wrap; max-height: 450px; overflow-y: auto; font-family: monospace; }
+        .peringatan { color: #dc2626; font-weight: bold; text-align: center; }
     </style>
 </head>
 <body>
     <div class="card">
-        <h2>📋 Dafian Checker Bio</h2>
-        <p class="peringatan">⚠️ Wajib Tautkan Nomor Dulu Sebelum Cek</p>
+        <h2>🤖 Dafian Checker Panel</h2>
+        <p class="peringatan">⚠️ Masukkan Token Bot Telegram & Nomor untuk Pairing</p>
 
-        <label>Nomor HP (contoh: +628123456789):</label>
-        <input type="text" id="nomorAkun" placeholder="+62...">
-        <button onclick="mintaKode()">🔑 Dapatkan Kode Pairing</button>
+        <label>🔑 Token Bot Telegram:</label>
+        <input type="text" id="token" placeholder="Masukkan token dari @BotFather">
 
-        <div id="tampilanKode" class="info" style="display:none;"></div>
-        <div id="statusKoneksi" style="margin:10px 0; text-align:center;"></div>
-    </div>
+        <label>📱 Nomor HP (format: +628xxxx):</label>
+        <input type="text" id="nomor" placeholder="+628123456789">
 
-    <div class="card">
-        <h3>🔍 Masukkan Daftar Nomor</h3>
-        <textarea id="daftarNomor" rows="5" placeholder="+628xxxx
-+628xxxx
-..."></textarea>
-        <button onclick="mulaiCek()" id="tombolCek" disabled>🚀 Mulai Cek</button>
-        <br><br>
-        <button onclick="unduhTeks()" id="tombolUnduh" style="background:#10b981; display:none;">📥 Unduh Hasil (.txt)</button>
+        <button class="btn-blue" onclick="simpanData()">💾 Simpan & Aktifkan Bot</button>
+        <div id="status"></div>
+
+        <label>📋 Daftar Nomor yang Ingin Dicek:</label>
+        <textarea id="daftar" rows="5" placeholder="Satu baris satu nomor..."></textarea>
+        <button class="btn-green" onclick="mulaiCek()">🚀 Mulai Cek</button>
     </div>
 
     <div class="card">
         <h3>📄 Hasil</h3>
-        <div class="hasil" id="areaHasil">Belum ada data...</div>
+        <div class="hasil" id="hasil">Belum ada data...</div>
     </div>
 
     <script>
-        let terhubung = false;
         let teksHasil = "";
 
-        async function mintaKode() {
-            const nomor = document.getElementById("nomorAkun").value.trim();
-            if (!nomor) return alert("Isi nomor dulu pakai format +62...");
+        async function simpanData() {
+            const token = document.getElementById("token").value.trim();
+            const nomor = document.getElementById("nomor").value.trim();
+            if (!token || !nomor) return alert("Isi semua kolom!");
+            document.getElementById("status").innerText = "⏳ Memproses...";
 
-            document.getElementById("tampilanKode").style.display = "none";
-            document.getElementById("statusKoneksi").innerHTML = "⏳ Memproses... Mohon tunggu";
-
-            try {
-                const res = await fetch("/api/check", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ aksi: "dapatkan_kode", nomor: nomor })
-                });
-                const data = await res.json();
-
-                if (data.berhasil) {
-                    document.getElementById("tampilanKode").innerHTML = `KODE PAIRING: <br><strong style="font-size:22px; letter-spacing:3px;">${data.kode}</strong><br><br>Salin & buka WA > Setelan > Perangkat Tertaut > Tautkan Perangkat > Gunakan kode ini`;
-                    document.getElementById("tampilanKode").style.display = "block";
-                    cekStatusSetiapDetik();
-                } else {
-                    document.getElementById("statusKoneksi").innerHTML = `❌ ${data.pesan}`;
-                }
-            } catch {
-                document.getElementById("statusKoneksi").innerHTML = "❌ Gagal terhubung ke server";
-            }
-        }
-
-        async function cekStatusSetiapDetik() {
-            const interval = setInterval(async () => {
-                const res = await fetch("/api/check", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ aksi: "cek_koneksi" })
-                });
-                const data = await res.json();
-
-                if (data.terhubung) {
-                    clearInterval(interval);
-                    terhubung = true;
-                    document.getElementById("statusKoneksi").innerHTML = "✅ Berhasil Tertaut! Status: Online";
-                    document.getElementById("tombolCek").disabled = false;
-                }
-            }, 2500);
+            const res = await fetch("/api/bot", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ aksi: "set_token", token, nomor })
+            });
+            const data = await res.json();
+            document.getElementById("status").innerHTML = data.sukses
+                ? "✅ Bot Aktif! Kode Pairing: <strong>" + data.kode + "</strong><br>Masukkan ke WA > Perangkat Tertaut"
+                : "❌ Gagal: " + data.pesan;
         }
 
         async function mulaiCek() {
-            if (!terhubung) return alert("⚠️ Belum terhubung!");
-            const list = document.getElementById("daftarNomor").value.trim().split("\n").map(n => n.trim()).filter(n => n);
-            if (list.length < 1) return alert("Masukkan nomor dulu!");
+            const list = document.getElementById("daftar").value.trim().split("\n").map(n => n.trim()).filter(Boolean);
+            if (!list.length) return alert("Masukkan daftar nomor!");
+            document.getElementById("hasil").innerText = "🔍 Memeriksa...";
 
             const mulai = Date.now();
-            document.getElementById("areaHasil").innerText = "🔍 Sedang memeriksa...";
-
-            const res = await fetch("/api/check", {
+            const res = await fetch("/api/bot", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ aksi: "proses_cek", nomor_list: list })
+                body: JSON.stringify({ aksi: "cek_nomor", list })
             });
-            const hasil = await res.json();
+            const data = await res.json();
+            const detik = ((Date.now() - mulai)/1000).toFixed(1);
+
+            teksHasil = formatLaporan(data, detik);
+            document.getElementById("hasil").innerText = teksHasil;
+        }
+
+        function formatLaporan(data, detik) {
+            const m = Math.floor(detik/60);
+            const d = (detik%60).toFixed(1);
+            const waktu = new Date().toLocaleString("id-ID");
+            return `「 📋 HASIL CEK BIO WHATSAPP 」
+
+👤 Request   : Pengguna Web
+🎯 Mode      : 🔢 Mode Urutan
+━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📊 Statistik:
+├ Total Dicek       : ${data.stat.total}
+├ Terdaftar         : ${data.stat.terdaftar}
+├ Dengan Bio        : ${data.stat.bio_ada}
+├ Tanpa Bio         : ${data.stat.bio_tidak}
+└ Registered Final  : ${data.stat.terdaftar}
+
+📱 Jenis Akun:
+├ 📳 WA Business    : ${data.stat.bisnis}
+└ 📳 WA Biasa       : ${data.stat.biasa}
+
+🏅 Meta Business Tier:
+├ ⭐ EXCLUSIVE (≥7)  : 0
+├ 🟡 STANDARD (4–6)  : 0
+└ 🔴 LOW (1–3)        : ${data.stat.bisnis}
+
+⏱️ Eksekusi   : ${detik} detik (${m} Menit ${d} detik)
+🕐 Waktu (WIB)  : ${waktu}
+
+══════════════════════════════════════════════════════════
+📱 DETAIL AKUN
+══════════════════════════════════════════════════════════
+${data.detail.join("\n\n")}
+
+══════════════════════════════════════════════════════════
+⚡ Engine   : Dafian Checker Bio
+══════════════════════════════════════════════════════════`;
+        }
+    </script>
+</body>
+</html>
             const durasi = ((Date.now() - mulai)/1000).toFixed(1);
 
             teksHasil = formatLaporan(hasil, durasi);
