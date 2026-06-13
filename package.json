@@ -1,11 +1,12 @@
 {
-  "name": "dafian-checker-bio",
+  "name": "dafian-wa-bot",
   "version": "1.0.0",
+  "description": "Telegram Bot + WhatsApp Pairing",
+  "main": "api/bot.js",
   "dependencies": {
-    "@whiskeysockets/baileys": "6.7.9",
-    "pino": "^8.17.2"
-  },
-  "engines": {
-    "node": "20.x"
+    "@whiskeysockets/baileys": "^6.7.9",
+    "telegraf": "^4.15.3",
+    "pino": "^8.17.2",
+    "node-cache": "^5.1.2"
   }
 }
