@@ -103,7 +103,7 @@
             document.getElementById("areaHasil").innerText = "🔍 Sedang memeriksa...";
 
             const res = await fetch("/api/check", {
-                method: "POST,",
+                method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ aksi: "proses_cek", nomor_list: list })
             });
