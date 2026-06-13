@@ -1,15 +1,14 @@
 {
   "version": 2,
   "builds": [
-    { "src": "api/bot.js", "use": "@vercel/node" },
+    { "src": "api/run.js", "use": "@vercel/node" },
     { "src": "index.html", "use": "@vercel/static" }
   ],
   "routes": [
-    { "src": "/api/(.*)", "dest": "/api/bot.js" },
-    { "src": "/setwebhook", "dest": "/api/bot.js" },
+    { "src": "/api/(.*)", "dest": "/api/run.js" },
     { "src": "/", "dest": "/index.html" }
   ],
   "functions": {
-    "api/bot.js": { "maxDuration": 30 }
+    "api/run.js": { "maxDuration": 30 }
   }
 }
