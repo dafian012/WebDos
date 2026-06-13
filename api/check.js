@@ -1,101 +1,74 @@
 const { default: makeWASocket, useMultiFileAuthState } = require('@whiskeysockets/baileys');
 const pino = require('pino');
 
-let sock;
+let koneksi;
 
 module.exports = async (req, res) => {
     res.setHeader('Content-Type', 'application/json');
-    const { aksi, nomor, nomorList } = req.body;
+    const { aksi, nomor, nomor_list } = req.body;
 
     try {
-        if (!sock) {
-            const { state, saveCreds } = await useMultiFileAuthState('./auth');
-            sock = makeWASocket({
+        if (!koneksi) {
+            const { state, saveCreds } = await useMultiFileAuthState('./simpan_data');
+            koneksi = makeWASocket({
                 auth: state,
-                printQRInTerminal: false,
                 logger: pino({ level: 'silent' }),
-                syncFullHistory: false
+                syncFullHistory: false,
+                printQRInTerminal: false
             });
-            sock.ev.on('creds.update', saveCreds);
+            koneksi.ev.on('creds.update', saveCreds);
         }
 
-        if (aksi === "mintaKode") {
-            if (sock.authState.creds.me) {
-                return res.json({ sukses: false, pesan: "Sudah terhubung" });
+        if (aksi === "dapatkan_kode") {
+            if (koneksi.authState.creds.me) {
+                return res.json({ berhasil: false, pesan: "Sudah terhubung, gunakan saja" });
             }
-            const kode = await sock.requestPairingCode(nomor.replace(/[^0-9]/g, ''));
-            return res.json({ sukses: true, kode });
+            const bersih = nomor.replace(/\D/g, '');
+            const kode = await koneksi.requestPairingCode(bersih);
+            return res.json({ berhasil: true, kode: kode });
         }
 
-        if (aksi === "cekKoneksi") {
-            const terhubung = !!sock.authState.creds.me && sock.user?.id;
-            return res.json({ terhubung });
+        if (aksi === "cek_koneksi") {
+            const siap = !!(koneksi.authState.creds.me && koneksi.user?.id);
+            return res.json({ terhubung: siap });
         }
 
-        if (aksi === "cekNomor") {
-            if (!sock.authState.creds.me) {
-                return res.json({ sukses: false, pesan: "⚠️ Belum dipasangkan, tidak bisa cek!" });
+        if (aksi === "proses_cek") {
+            if (!koneksi.authState.creds.me) {
+                return res.json({ berhasil: false, pesan: "⚠️ Belum dipasangkan!" });
             }
 
-            const stat = { total: nomorList.length, terdaftar: 0, adaBio: 0, tanpaBio: 0, waBiasa: 0, waBisnis: 0, tierLow: 0 };
+            const stat = { total: nomor_list.length, terdaftar:0, bio_ada:0, bio_tidak:0, biasa:0, bisnis:0 };
             const detail = [];
 
-            for (const num of nomorList) {
+            for (const n of nomor_list) {
                 try {
-                    const id = num.replace(/[^0-9]/g, '') + '@s.whatsapp.net';
-                    const [cek, status] = await Promise.all([
-                        sock.onWhatsApp(id),
-                        sock.fetchStatus(id).catch(() => ({ status: "" }))
-                    ]);
+                    const id = n.replace(/\D/g, '') + '@s.whatsapp.net';
+                    const cekAda = await koneksi.onWhatsApp(id);
 
-                    if (cek?.exists) {
+                    if (cekAda[0]?.exists) {
                         stat.terdaftar++;
-                        const bio = status.status || "-";
-                        bio !== "-" ? stat.adaBio++ : stat.tanpaBio++;
-                        const isBisnis = !!cek.isBusiness;
-                        isBisnis ? stat.waBisnis++ : stat.waBiasa++;
-                        if (isBisnis) stat.tierLow++;
+                        const infoBio = await koneksi.fetchStatus(id).catch(() => ({ status: "-" }));
+                        const bio = infoBio.status || "-";
+                        bio !== "-" ? stat.bio_ada++ : stat.bio_tidak++;
 
-                        detail.push(`${num}
+                        const isBisnis = !!cekAda[0].isBusiness;
+                        isBisnis ? stat.bisnis++ : stat.biasa++;
+
+                        detail.push(`${n}
 Nama        : -
 Bio         : ${bio}
-Last Update : ${new Date().toLocaleDateString("id-ID")}
 Aplikasi    : ${isBisnis ? "WhatsApp Business" : "WhatsApp Biasa"}
-Profil      : ${cek.imgUrl ? "Ada ✅" : "Tidak Ada ❌"}
+Profil      : ${cekAda[0].imgUrl ? "Ada ✅" : "Tidak Ada ❌"}
 Status      : 🔴 Offline`);
                     }
                 } catch {}
             }
 
-            return res.json({ sukses: true, stat, detail });
+            return res.json({ berhasil: true, stat: stat, detail: detail });
         }
 
     } catch (err) {
-        return res.json({ sukses: false, pesan: err.message });
+        return res.json({ berhasil: false, pesan: err.message });
     }
 };
-    });
-    
-    // Kalo ga dapet hasil dari scraping, pake fallback API
-    if(finalResults.length === 0) {
-        // Coba pake Google Programmable Search API (kalo ada API key)
-        // Atau pake hasil dari sumber lain
-        finalResults = [
-            `https://example.com/page.php?id=1`,
-            `https://sample.com/detail.php?id=2`,
-            `https://testsite.com/product.php?id=3`
-        ];
-    }
-    
-    res.json({
-        success: true,
-        query: dork,
-        source: 'real_google_scrape',
-        total: finalResults.length,
-        results: finalResults.slice(0, limit || 50),
-        antiBlock: {
-            userAgent: randomUA,
-            ipUsed: randomIP
-        }
-    });
-        }
