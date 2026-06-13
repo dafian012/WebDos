@@ -1,172 +1,330 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dafian Checker Bio</title>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
-    body { background: #f0f2f5; padding: 20px; max-width: 650px; margin: 0 auto; }
-    .card { background: #fff; border-radius: 8px; padding: 20px; box-shadow: 0 2px 8px #0000001a; margin-bottom: 15px; }
-    h2 { text-align: center; color: #2563eb; margin-bottom: 15px; }
-    .info { background: #dbeafe; padding: 12px; border-radius: 6px; text-align: center; font-weight: bold; margin: 10px 0; }
-    .peringatan { color: #dc2626; font-weight: bold; text-align: center; margin: 10px 0; }
-    input, textarea { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ddd; border-radius: 4px; font-size: 15px; }
-    button { width: 100%; padding: 11px; background: #2563eb; color: white; border: none; border-radius: 4px; font-size: 16px; cursor: pointer; margin-top: 8px; }
-    button:disabled { background: #94a3b8; cursor: not-allowed; }
-    .hasil { background: #111; color: #0f0; padding: 15px; border-radius: 4px; white-space: pre-wrap; max-height: 450px; overflow-y: auto; font-family: monospace; font-size: 13px; margin-top: 10px; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dafian Checker Bio - Telegram Bot Panel 🗿</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0a0a0a;
+            min-height: 100vh;
+            color: #e0e0e0;
+        }
+        .navbar {
+            background: #000;
+            padding: 14px 24px;
+            border-bottom: 1px solid #222;
+        }
+        .nav-container {
+            max-width: 600px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            font-weight: 700;
+            font-size: 16px;
+            color: #25D366;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+        .hero {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .hero h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #25D366;
+        }
+        .hero p {
+            color: #666;
+            font-size: 12px;
+        }
+        .card {
+            background: #111;
+            border-radius: 14px;
+            padding: 24px;
+            margin-bottom: 20px;
+            border: 1px solid #222;
+        }
+        .card-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #25D366;
+        }
+        input {
+            width: 100%;
+            padding: 12px 14px;
+            background: #0a0a0a;
+            border: 1px solid #333;
+            border-radius: 10px;
+            color: #e0e0e0;
+            font-size: 13px;
+            margin-bottom: 16px;
+        }
+        input:focus {
+            outline: none;
+            border-color: #25D366;
+        }
+        .btn {
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            width: 100%;
+        }
+        .btn-primary {
+            background: #25D366;
+            color: #000;
+        }
+        .btn-primary:hover {
+            background: #128C7E;
+        }
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        .status-box {
+            background: #0a0a0a;
+            border-radius: 10px;
+            padding: 16px;
+            margin-top: 16px;
+            border: 1px solid #222;
+            font-size: 12px;
+        }
+        .status-online {
+            color: #25D366;
+        }
+        .status-offline {
+            color: #f66;
+        }
+        .log-box {
+            background: #0a0a0a;
+            border-radius: 10px;
+            padding: 16px;
+            font-family: monospace;
+            font-size: 11px;
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #222;
+            margin-top: 16px;
+        }
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #555;
+            font-size: 10px;
+        }
+        .command-list {
+            background: #0a0a0a;
+            border-radius: 10px;
+            padding: 12px;
+            margin-top: 12px;
+            font-size: 11px;
+        }
+        .command-list code {
+            background: #1a1a1a;
+            padding: 2px 6px;
+            border-radius: 6px;
+            color: #25D366;
+        }
+        .loading {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border: 2px solid #fff;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 0.6s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
 </head>
 <body>
-  <div class="card">
-    <h2>📋 Dafian Checker Bio</h2>
-    <p class="peringatan">⚠️ Cara pakai: Ketik format /pair 628xxxx di bawah ini</p>
 
-    <label>🔗 Perintah Pairing:</label>
-    <input type="text" id="perintah" placeholder="Contoh: /pair 628123456789">
-    <button onclick="prosesPair()">Dapatkan Kode</button>
+<nav class="navbar">
+    <div class="nav-container">
+        <div class="logo"><i class="fab fa-whatsapp"></i> Dafian Checker Bio</div>
+    </div>
+</nav>
 
-    <div id="tampilanKode" class="info" style="display: none;"></div>
-    <div id="statusKoneksi" style="text-align:center; margin:10px 0;"></div>
-  </div>
+<div class="container">
+    <div class="hero">
+        <h1><i class="fab fa-telegram"></i> Telegram Bot Panel</h1>
+        <p>Input Token Bot + ID Telegram | Bot WhatsApp Pairing & Checker</p>
+    </div>
 
-  <div class="card">
-    <h3>🔍 Cek Nomor</h3>
-    <label>Masukkan daftar nomor:</label>
-    <textarea id="daftarNomor" rows="6" placeholder="+628xxxx
-+628xxxx
-..."></textarea>
-    <button onclick="mulaiCek()" id="tombolCek" disabled>Mulai Cek</button>
-    <button onclick="unduhHasil()" id="tombolUnduh" style="background:#10b981; display:none; margin-top:8px;">Unduh Hasil (.txt)</button>
-  </div>
+    <div class="card">
+        <div class="card-title"><i class="fas fa-robot"></i> Konfigurasi Bot Telegram</div>
+        <input type="text" id="botToken" placeholder="Bot Token dari @BotFather" value="">
+        <input type="text" id="adminId" placeholder="ID Telegram Admin" value="">
+        <button class="btn btn-primary" onclick="startBot()" id="startBtn">
+            <i class="fas fa-play"></i> Start Bot
+        </button>
+        <button class="btn btn-danger" onclick="stopBot()" id="stopBtn" style="margin-top: 10px; display: none;">
+            <i class="fas fa-stop"></i> Stop Bot
+        </button>
+        
+        <div id="statusBox" class="status-box">
+            <span id="statusText">⚡ Bot belum berjalan</span>
+        </div>
 
-  <div class="card">
-    <h3>📄 Hasil</h3>
-    <div class="hasil" id="areaHasil">Belum ada data...</div>
-  </div>
+        <div class="command-list">
+            <strong>📌 Perintah Bot Telegram:</strong><br><br>
+            <code>/start</code> - Mulai bot<br>
+            <code>/pair 628xxxxxxxxx</code> - Dapatkan kode pairing WhatsApp<br>
+            <code>/ceknomor 628xxxxxxxxx</code> - Cek nomor (registered/bio/business)<br>
+            <code>/cekbatch</code> - Batch cek multiple nomor<br>
+            <code>/status</code> - Cek status koneksi WA<br>
+            <code>/logout</code> - Logout dari WA
+        </div>
+    </div>
 
-  <script>
-    let terhubung = false;
-    let teksHasil = "";
+    <div class="card">
+        <div class="card-title"><i class="fas fa-terminal"></i> Log Activity</div>
+        <div class="log-box" id="logBox">
+            <div>✨ Panel siap digunakan</div>
+            <div>📌 Masukkan Token Bot dan ID Telegram admin</div>
+        </div>
+    </div>
+</div>
 
-    async function prosesPair() {
-      const teks = document.getElementById("perintah").value.trim();
-      if (!teks.startsWith("/pair ")) {
-        return alert("❌ Format salah! Gunakan: /pair 628xxxx");
-      }
+<div class="footer">
+    <p>⚡ Dafian Checker Bio | Telegram Bot + WhatsApp Pairing REAL | by JMK48 🗿</p>
+</div>
 
-      const nomor = teks.replace("/pair ", "").trim();
-      document.getElementById("statusKoneksi").innerHTML = "⏳ Memuat...";
-      document.getElementById("tampilanKode").style.display = "none";
-
-      const res = await fetch("/api/run", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ aksi: "pairing", nomor_input: nomor })
-      });
-
-      const data = await res.json();
-      if (data.sukses) {
-        if (data.kode) {
-          document.getElementById("tampilanKode").innerHTML = `KODE PAIRING:<br><strong style="font-size:22px; letter-spacing:3px;">${data.kode}</strong>`;
-          document.getElementById("tampilanKode").style.display = "block";
-          cekKoneksiBerkala();
+<script>
+    let isBotRunning = false;
+    let botUrl = null;
+    
+    function addLog(msg, type = 'info') {
+        const logBox = document.getElementById('logBox');
+        const time = new Date().toLocaleTimeString();
+        const colors = { success: '#25D366', error: '#f66', warning: '#ffaa66', info: '#aaa' };
+        logBox.innerHTML += `<div style="color: ${colors[type] || '#aaa'}">[${time}] ${msg}</div>`;
+        logBox.scrollTop = logBox.scrollHeight;
+    }
+    
+    function updateStatus(text, isOnline = false) {
+        const statusBox = document.getElementById('statusText');
+        if (isOnline) {
+            statusBox.innerHTML = `<span class="status-online"><i class="fas fa-circle"></i> ${text}</span>`;
         } else {
-          document.getElementById("statusKoneksi").innerHTML = "✅ Sudah terhubung!";
-          terhubung = true;
-          document.getElementById("tombolCek").disabled = false;
+            statusBox.innerHTML = `<span class="status-offline"><i class="fas fa-circle"></i> ${text}</span>`;
         }
-      } else {
-        document.getElementById("statusKoneksi").innerHTML = data.pesan;
-      }
     }
-
-    async function cekKoneksiBerkala() {
-      const interval = setInterval(async () => {
-        const res = await fetch("/api/run", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ aksi: "cek_status" })
-        });
-        const data = await res.json();
-        if (data.terhubung) {
-          clearInterval(interval);
-          terhubung = true;
-          document.getElementById("statusKoneksi").innerHTML = "✅ Berhasil terhubung! Status: Online";
-          document.getElementById("tombolCek").disabled = false;
+    
+    async function startBot() {
+        const token = document.getElementById('botToken').value;
+        const adminId = document.getElementById('adminId').value;
+        
+        if (!token || !adminId) {
+            addLog('❌ Masukkan Bot Token dan ID Telegram!', 'error');
+            alert('Masukkan Bot Token dari @BotFather dan ID Telegram admin!');
+            return;
         }
-      }, 2500);
+        
+        const startBtn = document.getElementById('startBtn');
+        startBtn.innerHTML = '<div class="loading"></div> Menjalankan Bot...';
+        startBtn.disabled = true;
+        
+        addLog(`🚀 Menjalankan bot dengan token: ${token.substring(0, 10)}...`, 'info');
+        
+        try {
+            // Kirim request ke API untuk start bot
+            const response = await fetch('/api/bot', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    action: 'start',
+                    botToken: token,
+                    adminId: adminId
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                isBotRunning = true;
+                updateStatus('Bot Online ✅ | WhatsApp: ' + (data.waConnected ? 'Terhubung 🟢' : 'Menunggu Pairing ⏳'), true);
+                addLog(`✅ Bot berhasil dijalankan!`, 'success');
+                addLog(`🤖 Bot: @${data.botUsername || 'dafian_bot'}`, 'success');
+                addLog(`📱 WhatsApp: ${data.waConnected ? 'Sudah terhubung' : 'Belum terhubung, gunakan /pair'}`, 'info');
+                
+                document.getElementById('startBtn').style.display = 'none';
+                document.getElementById('stopBtn').style.display = 'block';
+            } else {
+                addLog(`❌ Gagal: ${data.error}`, 'error');
+                updateStatus('Gagal start: ' + (data.error || 'Unknown'), false);
+                startBtn.innerHTML = '<i class="fas fa-play"></i> Start Bot';
+                startBtn.disabled = false;
+            }
+        } catch (e) {
+            addLog(`❌ Error: ${e.message}`, 'error');
+            updateStatus('Error koneksi ke server', false);
+            startBtn.innerHTML = '<i class="fas fa-play"></i> Start Bot';
+            startBtn.disabled = false;
+        }
     }
-
-    async function mulaiCek() {
-      if (!terhubung) return alert("⚠️ Harap pairing dulu!");
-      const list = document.getElementById("daftarNomor").value.trim().split("\n").map(n => n.trim()).filter(Boolean);
-      if (!list.length) return alert("Masukkan daftar nomor!");
-
-      const mulai = Date.now();
-      document.getElementById("areaHasil").innerText = "🔍 Sedang memeriksa...";
-
-      const res = await fetch("/api/run", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ aksi: "proses_cek", daftar_nomor: list })
-      });
-
-      const data = await res.json();
-      const durasi = ((Date.now() - mulai) / 1000).toFixed(1);
-      teksHasil = buatLaporan(data, durasi);
-      document.getElementById("areaHasil").innerText = teksHasil;
-      document.getElementById("tombolUnduh").style.display = "block";
+    
+    async function stopBot() {
+        addLog(`🛑 Menghentikan bot...`, 'warning');
+        
+        try {
+            const response = await fetch('/api/bot', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'stop' })
+            });
+            
+            const data = await response.json();
+            isBotRunning = false;
+            updateStatus('Bot Stopped ❌', false);
+            addLog(`✅ Bot dihentikan`, 'success');
+            
+            document.getElementById('startBtn').style.display = 'block';
+            document.getElementById('stopBtn').style.display = 'none';
+            document.getElementById('startBtn').innerHTML = '<i class="fas fa-play"></i> Start Bot';
+            document.getElementById('startBtn').disabled = false;
+        } catch (e) {
+            addLog(`❌ Error stop: ${e.message}`, 'error');
+        }
     }
-
-    function buatLaporan(data, detik) {
-      const m = Math.floor(detik / 60);
-      const d = (detik % 60).toFixed(1);
-      const waktu = new Date().toLocaleString("id-ID");
-
-      return `「 📋 HASIL CEK BIO WHATSAPP 」
-
-👤 Request   : Pengguna Web
-🎯 Mode      : 🔢 Mode Urutan
-━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📊 Statistik:
-├ Total Dicek       : ${data.stat.total}
-├ Terdaftar         : ${data.stat.terdaftar}
-├ Dengan Bio        : ${data.stat.bio_ada}
-├ Tanpa Bio         : ${data.stat.bio_tidak}
-└ Registered Final  : ${data.stat.terdaftar}
-
-📱 Jenis Akun:
-├ 📳 WA Business    : ${data.stat.bisnis}
-└ 📳 WA Biasa       : ${data.stat.biasa}
-
-🏅 Meta Business Tier:
-├ ⭐ EXCLUSIVE (≥7)  : 0
-├ 🟡 STANDARD (4–6)  : 0
-└ 🔴 LOW (1–3)        : ${data.stat.bisnis}
-
-⏱️ Eksekusi   : ${detik} detik (${m} Menit ${d} detik)
-🕐 Waktu (WIB)  : ${waktu}
-
-══════════════════════════════════════════════════════════
-📱 DETAIL AKUN
-══════════════════════════════════════════════════════════
-${data.detail.join("\n\n")}
-
-══════════════════════════════════════════════════════════
-⚡ Engine   : Dafian Checker Bio
-══════════════════════════════════════════════════════════`;
+    
+    // Cek status bot saat load
+    async function checkStatus() {
+        try {
+            const response = await fetch('/api/bot?action=status');
+            const data = await response.json();
+            if (data.running) {
+                isBotRunning = true;
+                updateStatus(`Bot Online ✅ | ${data.waConnected ? 'WA Terhubung 🟢' : 'Menunggu Pairing'}`, true);
+                document.getElementById('startBtn').style.display = 'none';
+                document.getElementById('stopBtn').style.display = 'block';
+                addLog(`🔄 Bot sudah berjalan sejak sebelumnya`, 'info');
+            }
+        } catch (e) {}
     }
-
-    function unduhHasil() {
-      const blob = new Blob([teksHasil], { type: "text/plain" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `Hasil_Cek_WA_${Date.now()}.txt`;
-      a.click();
-      URL.revokeObjectURL(url);
-    }
-  </script>
+    
+    checkStatus();
+</script>
 </body>
 </html>
