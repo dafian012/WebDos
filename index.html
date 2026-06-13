@@ -31,6 +31,13 @@
             font-size: 16px;
             color: #25D366;
         }
+        .badge {
+            background: #1a1a1a;
+            color: #25D366;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 10px;
+        }
         .container {
             max-width: 600px;
             margin: 0 auto;
@@ -156,6 +163,19 @@
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
+        .backend-input {
+            background: #1a2a1a;
+            border-color: #25D366;
+        }
+        .warning-box {
+            background: #2a1a1a;
+            border-left: 3px solid #ff6600;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            margin-bottom: 16px;
+            color: #ffaa66;
+        }
     </style>
 </head>
 <body>
@@ -163,13 +183,26 @@
 <nav class="navbar">
     <div class="nav-container">
         <div class="logo"><i class="fab fa-whatsapp"></i> Dafian Checker Bio</div>
+        <div><span class="badge">GitHub Pages + Vercel</span></div>
     </div>
 </nav>
 
 <div class="container">
     <div class="hero">
         <h1><i class="fab fa-telegram"></i> Telegram Bot Panel</h1>
-        <p>Input Token Bot + ID Telegram | Bot WhatsApp Pairing & Checker</p>
+        <p>Input Token Bot + ID Telegram | Backend via Vercel</p>
+    </div>
+
+    <!-- Peringatan -->
+    <div class="warning-box">
+        ⚠️ Frontend ini hanya panel kontrol. BACKEND harus di deploy ke VERCEL dulu!<br>
+        📌 Masukkan URL Backend Vercel Anda di bawah.
+    </div>
+
+    <div class="card">
+        <div class="card-title"><i class="fas fa-server"></i> Konfigurasi Backend Vercel</div>
+        <input type="text" id="backendUrl" class="backend-input" placeholder="https://nama-backend.vercel.app" value="">
+        <small style="color: #666;">Masukkan URL backend Vercel tempat bot.js berjalan</small>
     </div>
 
     <div class="card">
@@ -202,18 +235,24 @@
         <div class="card-title"><i class="fas fa-terminal"></i> Log Activity</div>
         <div class="log-box" id="logBox">
             <div>✨ Panel siap digunakan</div>
+            <div>📌 Masukkan URL Backend Vercel terlebih dahulu</div>
             <div>📌 Masukkan Token Bot dan ID Telegram admin</div>
         </div>
     </div>
 </div>
 
 <div class="footer">
-    <p>⚡ Dafian Checker Bio | Telegram Bot + WhatsApp Pairing REAL | by JMK48 🗿</p>
+    <p>⚡ Dafian Checker Bio | Frontend: GitHub Pages | Backend: Vercel 🗿</p>
 </div>
 
 <script>
     let isBotRunning = false;
-    let botUrl = null;
+    let backendUrl = localStorage.getItem('backendUrl') || '';
+    
+    // Load saved backend URL
+    if (backendUrl) {
+        document.getElementById('backendUrl').value = backendUrl;
+    }
     
     function addLog(msg, type = 'info') {
         const logBox = document.getElementById('logBox');
@@ -233,8 +272,15 @@
     }
     
     async function startBot() {
+        const backend = document.getElementById('backendUrl').value;
         const token = document.getElementById('botToken').value;
         const adminId = document.getElementById('adminId').value;
+        
+        if (!backend) {
+            addLog('❌ Masukkan URL Backend Vercel terlebih dahulu!', 'error');
+            alert('Masukkan URL Backend Vercel (contoh: https://nama-backend.vercel.app)');
+            return;
+        }
         
         if (!token || !adminId) {
             addLog('❌ Masukkan Bot Token dan ID Telegram!', 'error');
@@ -242,21 +288,24 @@
             return;
         }
         
+        // Save backend URL
+        localStorage.setItem('backendUrl', backend);
+        
         const startBtn = document.getElementById('startBtn');
         startBtn.innerHTML = '<div class="loading"></div> Menjalankan Bot...';
         startBtn.disabled = true;
         
-        addLog(`🚀 Menjalankan bot dengan token: ${token.substring(0, 10)}...`, 'info');
+        addLog(`🚀 Menghubungi backend: ${backend}`, 'info');
+        addLog(`🤖 Menjalankan bot dengan token: ${token.substring(0, 10)}...`, 'info');
         
         try {
-            // Kirim request ke API untuk start bot
-            const response = await fetch('/api/bot', {
+            const response = await fetch(`${backend}/api/bot`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     action: 'start',
                     botToken: token,
-                    adminId: adminId
+                    adminIdTelegram: adminId
                 })
             });
             
@@ -278,18 +327,24 @@
                 startBtn.disabled = false;
             }
         } catch (e) {
-            addLog(`❌ Error: ${e.message}`, 'error');
-            updateStatus('Error koneksi ke server', false);
+            addLog(`❌ Error: ${e.message} - Cek URL backend dan pastikan sudah di deploy!`, 'error');
+            updateStatus('Error koneksi ke backend', false);
             startBtn.innerHTML = '<i class="fas fa-play"></i> Start Bot';
             startBtn.disabled = false;
         }
     }
     
     async function stopBot() {
+        const backend = document.getElementById('backendUrl').value;
+        if (!backend) {
+            addLog('❌ Masukkan URL Backend!', 'error');
+            return;
+        }
+        
         addLog(`🛑 Menghentikan bot...`, 'warning');
         
         try {
-            const response = await fetch('/api/bot', {
+            const response = await fetch(`${backend}/api/bot`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ action: 'stop' })
@@ -309,22 +364,32 @@
         }
     }
     
-    // Cek status bot saat load
-    async function checkStatus() {
+    // Cek status backend saat load
+    async function checkBackendStatus() {
+        const backend = document.getElementById('backendUrl').value;
+        if (!backend) return;
+        
         try {
-            const response = await fetch('/api/bot?action=status');
+            const response = await fetch(`${backend}/api/bot?action=status`);
             const data = await response.json();
             if (data.running) {
                 isBotRunning = true;
                 updateStatus(`Bot Online ✅ | ${data.waConnected ? 'WA Terhubung 🟢' : 'Menunggu Pairing'}`, true);
                 document.getElementById('startBtn').style.display = 'none';
                 document.getElementById('stopBtn').style.display = 'block';
-                addLog(`🔄 Bot sudah berjalan sejak sebelumnya`, 'info');
+                addLog(`🔄 Bot sudah berjalan di backend`, 'info');
             }
-        } catch (e) {}
+        } catch (e) {
+            addLog(`⚠️ Backend belum terdeteksi, pastikan URL benar`, 'warning');
+        }
     }
     
-    checkStatus();
+    // Auto check setelah 2 detik
+    setTimeout(() => {
+        if (document.getElementById('backendUrl').value) {
+            checkBackendStatus();
+        }
+    }, 2000);
 </script>
 </body>
 </html>
