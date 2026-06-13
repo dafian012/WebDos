@@ -1,7 +1,7 @@
 {
-  "name": "dafian-wa-bot",
+  "name": "dafian-wa-bot-backend",
   "version": "1.0.0",
-  "description": "Telegram Bot + WhatsApp Pairing",
+  "description": "Backend untuk Telegram Bot + WA Pairing",
   "main": "api/bot.js",
   "dependencies": {
     "@whiskeysockets/baileys": "^6.7.9",
