@@ -5,15 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TikTok Downloader — DafianTools</title>
     <meta name="description" content="Download video TikTok tanpa watermark, slide foto, MP3, story, dan foto profil HD. Gratis!">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎵</text></svg>">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <!-- BACKGROUND ANIMATION -->
     <div class="bg-animation">
         <div class="orb orb-1"></div>
         <div class="orb orb-2"></div>
         <div class="orb orb-3"></div>
     </div>
 
+    <!-- HEADER -->
     <header class="header">
         <div class="header-container">
             <a href="/" class="logo">
@@ -22,8 +25,8 @@
             </a>
             <nav class="nav">
                 <a href="/" class="nav-link">Beranda</a>
-                <a href="/tiktok" class="nav-link active">TikTok</a>
-                <a href="/instagram" class="nav-link">Instagram</a>
+                <a href="tiktok.html" class="nav-link active">TikTok</a>
+                <a href="instagram.html" class="nav-link">Instagram</a>
             </nav>
             <div class="hamburger" onclick="toggleMenu()">
                 <span></span><span></span><span></span>
@@ -31,12 +34,14 @@
         </div>
     </header>
 
+    <!-- MOBILE NAV -->
     <div class="mobile-nav" id="mobileNav">
         <a href="/" class="mobile-link">🏠 Beranda</a>
-        <a href="/tiktok" class="mobile-link active">🎵 TikTok Tools</a>
-        <a href="/instagram" class="mobile-link">📸 Instagram Tools</a>
+        <a href="tiktok.html" class="mobile-link active">🎵 TikTok Tools</a>
+        <a href="instagram.html" class="mobile-link">📸 Instagram Tools</a>
     </div>
 
+    <!-- MAIN CONTENT -->
     <main class="tool-page">
         <div class="tool-container">
             <!-- HEADER TOOL -->
@@ -73,7 +78,7 @@
                 </div>
 
                 <!-- DOWNLOAD BUTTONS -->
-                <div class="download-options animate-slide-up" id="downloadOptions">
+                <div class="download-options animate-slide-up">
                     <h3>📥 Download Options</h3>
                     <div class="download-grid">
                         <button class="dl-btn dl-video" onclick="downloadMedia('video')">
@@ -116,16 +121,18 @@
         </div>
     </main>
 
+    <!-- FOOTER -->
     <footer class="footer">
         <div class="footer-container">
             <p>© 2024 <strong>DafianTools</strong> — TikTok Downloader</p>
             <div class="footer-links">
-                <a href="/">Beranda</a>
-                <a href="/instagram">Instagram Tools</a>
+                <a href="index.html">Beranda</a>
+                <a href="instagram.html">Instagram Tools</a>
             </div>
         </div>
     </footer>
 
+    <!-- SCRIPTS -->
     <script src="greeting.js"></script>
     <script src="tiktok.js"></script>
     <script src="main.js"></script>
