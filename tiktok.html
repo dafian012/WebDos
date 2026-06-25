@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TikTok Downloader — DafianTools</title>
+    <meta name="description" content="Download video TikTok tanpa watermark, slide foto, MP3, story, dan foto profil HD. Gratis!">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="bg-animation">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+
+    <header class="header">
+        <div class="header-container">
+            <a href="/" class="logo">
+                <span class="logo-icon">🛠️</span>
+                <span class="logo-text">Dafian<span class="logo-highlight">Tools</span></span>
+            </a>
+            <nav class="nav">
+                <a href="/" class="nav-link">Beranda</a>
+                <a href="/tiktok" class="nav-link active">TikTok</a>
+                <a href="/instagram" class="nav-link">Instagram</a>
+            </nav>
+            <div class="hamburger" onclick="toggleMenu()">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+    </header>
+
+    <div class="mobile-nav" id="mobileNav">
+        <a href="/" class="mobile-link">🏠 Beranda</a>
+        <a href="/tiktok" class="mobile-link active">🎵 TikTok Tools</a>
+        <a href="/instagram" class="mobile-link">📸 Instagram Tools</a>
+    </div>
+
+    <main class="tool-page">
+        <div class="tool-container">
+            <!-- HEADER TOOL -->
+            <div class="tool-header animate-fade-in">
+                <div class="tool-brand">
+                    <span class="tool-icon">🎵</span>
+                    <h1>TikTok Downloader</h1>
+                </div>
+                <p class="tool-subtitle">Download video TikTok tanpa watermark, slide, MP3, story & profil HD</p>
+            </div>
+
+            <!-- INPUT SECTION -->
+            <div class="input-section animate-slide-up">
+                <div class="input-wrapper">
+                    <div class="input-icon">🔗</div>
+                    <input type="text" id="tiktokUrl" placeholder="Tempel link TikTok disini..." class="url-input">
+                    <button class="btn-download" onclick="processTikTok()">
+                        <span class="btn-text">Download</span>
+                        <div class="btn-loader" id="loader" style="display:none;"></div>
+                    </button>
+                </div>
+                <div class="input-hint">Contoh: https://vt.tiktok.com/xxxxx atau https://www.tiktok.com/@user/video/xxxxx</div>
+            </div>
+
+            <!-- RESULT SECTION -->
+            <div class="result-section" id="resultSection" style="display:none;">
+                <!-- VIDEO PREVIEW -->
+                <div class="preview-card animate-fade-in">
+                    <div class="preview-header">
+                        <span class="preview-badge">PREVIEW</span>
+                    </div>
+                    <div class="preview-video" id="videoPreview"></div>
+                    <div class="preview-info" id="videoInfo"></div>
+                </div>
+
+                <!-- DOWNLOAD BUTTONS -->
+                <div class="download-options animate-slide-up" id="downloadOptions">
+                    <h3>📥 Download Options</h3>
+                    <div class="download-grid">
+                        <button class="dl-btn dl-video" onclick="downloadMedia('video')">
+                            <span class="dl-icon">🎬</span>
+                            <span class="dl-text">Video HD</span>
+                            <span class="dl-badge">No WM</span>
+                        </button>
+                        <button class="dl-btn dl-slide" onclick="downloadMedia('slide')">
+                            <span class="dl-icon">🖼️</span>
+                            <span class="dl-text">Slide Foto</span>
+                        </button>
+                        <button class="dl-btn dl-mp3" onclick="downloadMedia('mp3')">
+                            <span class="dl-icon">🎵</span>
+                            <span class="dl-text">MP3 Audio</span>
+                        </button>
+                        <button class="dl-btn dl-story" onclick="downloadMedia('story')">
+                            <span class="dl-icon">📖</span>
+                            <span class="dl-text">Story</span>
+                        </button>
+                        <button class="dl-btn dl-profile" onclick="downloadMedia('profile')">
+                            <span class="dl-icon">👤</span>
+                            <span class="dl-text">Foto Profil</span>
+                            <span class="dl-badge">HD</span>
+                        </button>
+                        <button class="dl-btn dl-thumb" onclick="downloadMedia('thumbnail')">
+                            <span class="dl-icon">🖼️</span>
+                            <span class="dl-text">Thumbnail</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- LOADING OVERLAY -->
+            <div class="loading-overlay" id="loadingOverlay" style="display:none;">
+                <div class="loading-card">
+                    <div class="spinner"></div>
+                    <p id="loadingText">Mengambil data...</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-container">
+            <p>© 2024 <strong>DafianTools</strong> — TikTok Downloader</p>
+            <div class="footer-links">
+                <a href="/">Beranda</a>
+                <a href="/instagram">Instagram Tools</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/greeting.js"></script>
+    <script src="js/tiktok.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

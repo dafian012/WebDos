@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DafianTools — Downloader Gratis TikTok & Instagram</title>
+    <meta name="description" content="DafianTools — Download video TikTok tanpa watermark, download foto & video Instagram HD gratis. Cepat, mudah, tanpa iklan.">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛠️</text></svg>">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- BACKGROUND ANIMATION -->
+    <div class="bg-animation">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+
+    <!-- GREETING POPUP -->
+    <div class="popup-overlay" id="greetingPopup">
+        <div class="popup-card animate-popup">
+            <div class="popup-icon" id="greetingIcon">🌅</div>
+            <h2 id="greetingTitle">Selamat Pagi!</h2>
+            <p id="greetingMessage">Selamat datang di DafianTools! 🌟</p>
+            <p class="popup-time" id="currentTime">00:00</p>
+            <button class="btn-primary btn-popup" onclick="closeGreeting()">
+                <span>Mulai Sekarang</span>
+                <svg viewBox="0 0 24 24" width="20" height="20"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- HEADER -->
+    <header class="header">
+        <div class="header-container">
+            <a href="/" class="logo">
+                <span class="logo-icon">🛠️</span>
+                <span class="logo-text">Dafian<span class="logo-highlight">Tools</span></span>
+            </a>
+            <nav class="nav">
+                <a href="/" class="nav-link active">Beranda</a>
+                <a href="/tiktok" class="nav-link">TikTok</a>
+                <a href="/instagram" class="nav-link">Instagram</a>
+            </nav>
+            <div class="hamburger" onclick="toggleMenu()">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+    </header>
+
+    <!-- MOBILE NAV -->
+    <div class="mobile-nav" id="mobileNav">
+        <a href="/" class="mobile-link active">🏠 Beranda</a>
+        <a href="/tiktok" class="mobile-link">🎵 TikTok Tools</a>
+        <a href="/instagram" class="mobile-link">📸 Instagram Tools</a>
+    </div>
+
+    <!-- HERO -->
+    <main class="hero">
+        <div class="hero-content">
+            <div class="badge animate-fade-in">🚀 GRATIS SELAMANYA</div>
+            <h1 class="hero-title animate-slide-up">
+                Download <span class="gradient-text">TikTok</span> & <span class="gradient-text-pink">Instagram</span><br>Tanpa Watermark
+            </h1>
+            <p class="hero-desc animate-slide-up delay-1">
+                Cepat • HD • Tanpa Iklan • No Watermark • Langsung Download
+            </p>
+            <div class="hero-cards animate-fade-in delay-2">
+                <a href="/tiktok" class="tool-card card-tiktok">
+                    <div class="card-icon">🎵</div>
+                    <h3>TikTok Tools</h3>
+                    <p>Download video, slide, MP3, story, profil</p>
+                    <span class="card-arrow">→</span>
+                </a>
+                <a href="/instagram" class="tool-card card-instagram">
+                    <div class="card-icon">📸</div>
+                    <h3>Instagram Tools</h3>
+                    <p>Foto, video, reels, story, IGTV, galeri</p>
+                    <span class="card-arrow">→</span>
+                </a>
+            </div>
+            <div class="features animate-fade-in delay-3">
+                <div class="feature-item">
+                    <span class="feature-icon">⚡</span>
+                    <span>Proses Cepat</span>
+                </div>
+                <div class="feature-item">
+                    <span class="feature-icon">🎯</span>
+                    <span>No Watermark</span>
+                </div>
+                <div class="feature-item">
+                    <span class="feature-icon">🔒</span>
+                    <span>Aman & Privat</span>
+                </div>
+                <div class="feature-item">
+                    <span class="feature-icon">📱</span>
+                    <span>Mobile Friendly</span>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="footer-container">
+            <p>© 2024 <strong>DafianTools</strong> — Dibuat dengan ❤️</p>
+            <div class="footer-links">
+                <a href="/tiktok">TikTok</a>
+                <a href="/instagram">Instagram</a>
+                <a href="#">GitHub</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- SCRIPTS -->
+    <script src="js/greeting.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

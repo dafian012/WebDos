@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instagram Downloader — DafianTools</title>
+    <meta name="description" content="Download foto, video, reels, story, dan galeri Instagram HD. Story saver, reel downloader, foto profil HD.">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="bg-animation">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+
+    <header class="header">
+        <div class="header-container">
+            <a href="/" class="logo">
+                <span class="logo-icon">🛠️</span>
+                <span class="logo-text">Dafian<span class="logo-highlight">Tools</span></span>
+            </a>
+            <nav class="nav">
+                <a href="/" class="nav-link">Beranda</a>
+                <a href="/tiktok" class="nav-link">TikTok</a>
+                <a href="/instagram" class="nav-link active">Instagram</a>
+            </nav>
+            <div class="hamburger" onclick="toggleMenu()">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+    </header>
+
+    <div class="mobile-nav" id="mobileNav">
+        <a href="/" class="mobile-link">🏠 Beranda</a>
+        <a href="/tiktok" class="mobile-link">🎵 TikTok Tools</a>
+        <a href="/instagram" class="mobile-link active">📸 Instagram Tools</a>
+    </div>
+
+    <main class="tool-page">
+        <div class="tool-container">
+            <!-- HEADER TOOL -->
+            <div class="tool-header animate-fade-in">
+                <div class="tool-brand">
+                    <span class="tool-icon">📸</span>
+                    <h1>Instagram Downloader</h1>
+                </div>
+                <p class="tool-subtitle">Pengunduh Foto, Video, Reels, Story & Galeri Instagram HD</p>
+            </div>
+
+            <!-- INPUT SECTION -->
+            <div class="input-section animate-slide-up">
+                <div class="input-wrapper">
+                    <div class="input-icon">🔗</div>
+                    <input type="text" id="instagramUrl" placeholder="Tempel link Instagram disini..." class="url-input">
+                    <button class="btn-download ig-btn" onclick="processInstagram()">
+                        <span class="btn-text">Download</span>
+                        <div class="btn-loader" id="igLoader" style="display:none;"></div>
+                    </button>
+                </div>
+                <div class="input-hint">Contoh: https://www.instagram.com/p/xxxxx atau https://www.instagram.com/reel/xxxxx</div>
+            </div>
+
+            <!-- RESULT SECTION -->
+            <div class="result-section" id="igResultSection" style="display:none;">
+                <!-- PREVIEW -->
+                <div class="preview-card animate-fade-in">
+                    <div class="preview-header">
+                        <span class="preview-badge ig-badge">PREVIEW</span>
+                    </div>
+                    <div class="preview-media" id="igPreview"></div>
+                    <div class="preview-info" id="igMediaInfo"></div>
+                </div>
+
+                <!-- DOWNLOAD BUTTONS -->
+                <div class="download-options animate-slide-up" id="igDownloadOptions">
+                    <h3>📥 Download Options</h3>
+                    <div class="download-grid">
+                        <button class="dl-btn dl-photo" onclick="downloadIG('photo')">
+                            <span class="dl-icon">🖼️</span>
+                            <span class="dl-text">Download Foto</span>
+                            <span class="dl-badge">HD</span>
+                        </button>
+                        <button class="dl-btn dl-gallery" onclick="downloadIG('gallery')">
+                            <span class="dl-icon">🖼️</span>
+                            <span class="dl-text">Galeri Foto</span>
+                            <span class="dl-badge">All</span>
+                        </button>
+                        <button class="dl-btn dl-story-ig" onclick="downloadIG('story')">
+                            <span class="dl-icon">📖</span>
+                            <span class="dl-text">Story IG</span>
+                        </button>
+                        <button class="dl-btn dl-reels" onclick="downloadIG('reels')">
+                            <span class="dl-icon">🎬</span>
+                            <span class="dl-text">Reels Video</span>
+                            <span class="dl-badge">HD</span>
+                        </button>
+                        <button class="dl-btn dl-video-ig" onclick="downloadIG('video')">
+                            <span class="dl-icon">📹</span>
+                            <span class="dl-text">Video IG</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- LOADING OVERLAY -->
+            <div class="loading-overlay" id="igLoadingOverlay" style="display:none;">
+                <div class="loading-card">
+                    <div class="spinner"></div>
+                    <p id="igLoadingText">Mengambil data...</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-container">
+            <p>© 2024 <strong>DafianTools</strong> — Instagram Downloader</p>
+            <div class="footer-links">
+                <a href="/">Beranda</a>
+                <a href="/tiktok">TikTok Tools</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/greeting.js"></script>
+    <script src="js/instagram.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
